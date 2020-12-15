@@ -137,6 +137,12 @@ input:focus:invalid {
 	left: 385px;
 }
 
+#jspsych-passive-learning-btngroup {
+	position: absolute;
+	top: 150px;
+	left: 328px;
+}
+
 #jspsych-comp-test-prompt-btngroup {
 	position: absolute;
 	top: 100px;

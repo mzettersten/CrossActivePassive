@@ -65,7 +65,7 @@ if (condition_temp=="pa") {
 } else if (condition_temp=="ap") {
 	var condition="active_passive"
 	var condition_list=["active","passive"]
-else {
+} else {
 	var condition="active_passive"
 	var condition_list=["active","passive"]
 };
@@ -82,28 +82,34 @@ jsPsych.data.addProperties({
 //define word items
 var wordItems = ["beppo","biffer","deela","finna","guffi", "kita","leemu","manu", "noopy","pahvy", "roozer", "sibu","soma", "tesser","tibble","zeevo"];
 //define image items
-var items = ["29.png","18.png","10.png","11.png","12.png","14.png","17.png","7.png","8.png","9.png","4.png","5.png","6.png","3.png","2.png","1.png"];
+var items = ["stims/29.png","stims/18.png","stims/10.png","stims/11.png","stims/12.png","stims/14.png","stims/17.png","stims/7.png","stims/8.png","stims/9.png","stims/4.png","stims/5.png","stims/6.png","stims/3.png","stims/2.png","stims/1.png"];
 //audio check
 var audio_check = ['audio1.m4a','audio2.m4a','audio3.m4a','audio4.m4a'];
-//stim names
-var stimNames = [];
-for (i=0; i<wordItems.length; i++){
-	name = "stim"+ i
-	stimNames.push(name)
-};
+
 //shuffle images and words	
 var itemsShuffled=jsPsych.randomization.shuffle(items);
 var wordsShuffled = jsPsych.randomization.shuffle(wordItems);
 var audio_check_shuffled = jsPsych.randomization.shuffle(audio_check);
-//associate words and items (images) in a dictionary
-var stims = {};
-for (i =0; i<items.length; i++) {
-	//convert each item to a dictionary containing the image and the word // use normally
-	curObject = {image: itemsShuffled[i], word: wordsShuffled[i]};
-	//curObject = {image: items[i], word: wordItems[i]}
-	//add this dictionary to the overall stimulus dictionary
-	stims[stimNames[i]] = curObject;
-};
+
+//create round stimuli
+var total_rounds = 2;
+round_items=[];
+round_words=[];
+round_audio_check=[];
+var stim_per_round=Math.ceil(itemsShuffled.length/total_rounds);
+var audio_check_per_round=Math.ceil(audio_check_shuffled.length/total_rounds);
+for (cur_round=0; cur_round<total_rounds; cur_round++) {
+	var subset_round_items=itemsShuffled.slice(cur_round*stim_per_round, (cur_round+1)*stim_per_round);
+	var subset_round_words=wordsShuffled.slice(cur_round*stim_per_round, (cur_round+1)*stim_per_round);
+	var subset_round_audio_check=audio_check_shuffled.slice(cur_round*audio_check_per_round, (cur_round+1)*audio_check_per_round);
+	round_items.push(subset_round_items);
+	round_words.push(subset_round_words);
+	round_audio_check.push(subset_round_audio_check);
+}
+
+console.log(round_items);
+console.log(round_words);
+console.log(round_audio_check);
 
 // TWO EXPERIMENTAL ROUNDS
 var overall_timeline = []
@@ -111,8 +117,32 @@ var overall_timeline = []
 for (round_num=0; round_num<total_rounds;round_num++) {
 
 	// DEFINE ONE LOOP
+	var cur_timeline=[];
 	// current selection condition
-	var cur_condition = condition[round_num];
+	var cur_condition = condition_list[round_num];
+	
+	//select current stims
+	var cur_round_items=round_items[round_num];
+	var cur_round_words=round_words[round_num];
+	var cur_round_audio_check=round_audio_check[round_num];
+	
+	//stim names
+	var stimNames = [];
+	for (i=0; i<cur_round_words.length; i++){
+		name = "stim"+ i
+		stimNames.push(name)
+	};
+	
+	//define stimuli and associate words and  objects in a dictionary
+	var stims = {};
+	for (i =0; i<cur_round_items.length; i++) {
+		//convert each item to a dictionary containing the image and the word // use normally
+		curObject = {image: cur_round_items[i], word: cur_round_words[i]};
+		//curObject = {image: items[i], word: wordItems[i]}
+		//add this dictionary to the overall stimulus dictionary
+		stims[stimNames[i]] = curObject;
+	};
+	console.log(stims);
 
 	// DEFINE TRAINING TRIALS
 
@@ -165,8 +195,8 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 		type: 'audio-check',
 		prompt: "Click on the Play button to hear an audio recording. Then enter the word you heard. Click the button to hear the sound again. Click on the Submit Answers button when you are finished <br>",
 		timeline: [
-			{stimulus: 'stims/'+audio_check_shuffled[0+2*round_num]},
-			{stimulus: 'stims/'+audio_check_shuffled[1+2*round_num]},
+			{stimulus: 'stims/'+cur_round_audio_check[0]},
+			{stimulus: 'stims/'+cur_round_audio_check[1]},
 		]
 	};
 
@@ -227,7 +257,7 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 	 			im1: stims[stimNames[currentStims[0]]]["image"],
 	 			im2: stims[stimNames[currentStims[1]]]["image"],
 			 	choices: ['START'],
-	    		data: {trialNum: trainingNum, trialType: "learning-prompt",round_condition: cur_condition}
+	    		data: {trialNum: trainingNum, trialType: "learning-prompt",round_condition: cur_condition, round_number: round_num}
 	 		};
 		
 			trainingCTBList.push(prompt);
@@ -243,7 +273,7 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 			 	audio1: "stims/"+stims[stimNames[currentStims[wordOrderShuffled[0]]]]["word"]+".m4a",
 			 	audio2: "stims/"+stims[stimNames[currentStims[wordOrderShuffled[1]]]]["word"]+".m4a",
 			 	audio: "true",
-	    		data: {trialNum: trainingNum, trialType: "learning", round_condition: cur_condition}
+	    		data: {trialNum: trainingNum, trialType: "learning", round_condition: cur_condition, round_number: round_num}
 	 		};
 			 trainingCTBList.push(trial);
 		};
@@ -263,10 +293,16 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 	if (cur_condition=="active") {
 	var selectionInstr = {
 	type: 'instructions',
-	pages: ['Next, you will get a chance to choose which alien to learn about next. On a trial, you will see all 8 aliens on the screen. Then, you will get tochoose which of the 8 aliens you would like to appear in the next learning trial. After you choose an alien, another alien will be chosen at random by the computer. Then, you will see a new learning trial - just like the ones you just saw - with two aliens: the alien you picked and the alien chosen at random. Remember that we will test how well you learned the words later, so try to make choices that will help you learn the names! Click NEXT to get started.'],
+	pages: ['Next, you will get a chance to choose which alien to learn about next. On a trial, you will see all 8 aliens on the screen. Then, you will get to choose which of the 8 aliens you would like to appear in the next learning trial. After you choose an alien, another alien will be chosen at random by the computer. Then, you will see a new learning trial - just like the ones you just saw - with two aliens: the alien you picked and the alien chosen at random. Remember that we will test how well you learned the words later, so try to make choices that will help you learn the names! Click NEXT to get started.'],
 	show_clickable_nav: true
 	}
-	} else if (cur_condition=="passive")
+	} else if (cur_condition=="passive") {
+		var selectionInstr = {
+		type: 'instructions',
+		pages: ['Next, you will get a chance to learn more about the names of the aliens. On a trial, you will see all 8 aliens on the screen. Next, two aliens will be chosen at random by the computer. Then, you will see a new learning trial - just like the ones you just saw - with these two aliens chosen. Remember that we will test how well you learned the words later, so try to learn the names! Click NEXT to get started.'],
+		show_clickable_nav: true
+		}
+	}
 
 	selectList.push(selectionInstr);
 
@@ -311,7 +347,8 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 			learningPos: selectPositionsShuffled[j],
 			wordOrder: selectionWordOrderShuffled[j],
 			choices: ['START'],
-	    	data: {trialNum: selectNum, trialType: "selection",round_condition: cur_condition}
+			condition: cur_condition,
+	    	data: {trialNum: selectNum, trialType: "selection",round_condition: cur_condition, round_number: round_num}
 		};
 	
 		selectList.push(select);
@@ -365,14 +402,14 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 				image3: stims[stimNames[curLocationList[2]]]["image"],
 				image4: stims[stimNames[curLocationList[3]]]["image"],
 				image5: stims[stimNames[curLocationList[4]]]["image"],
-				image6: s tims[stimNames[curLocationList[5]]]["image"],
+				image6: stims[stimNames[curLocationList[5]]]["image"],
 				image7: stims[stimNames[curLocationList[6]]]["image"],
 				image8: stims[stimNames[curLocationList[7]]]["image"],
 		    	label: stims[stimNames[curTargetIndex]]["word"],
 				targetLocation: curTargetIndex,
 				targetImage: stims[stimNames[curTargetIndex]]["image"],
 			choices: ['START'],
-		    	data: {trialNum: testNum, trialType: "test-prompt",round_condition: cur_condition}
+		    	data: {trialNum: testNum, trialType: "test-prompt",round_condition: cur_condition, round_number: round_num}
 		};
 		
 		var test = {
@@ -388,7 +425,7 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 		    	label: stims[stimNames[curTargetIndex]]["word"],
 				targetLocation: curTargetIndex,
 				targetImage: stims[stimNames[curTargetIndex]]["image"],
-	    	data: {trialNum: testNum, trialType: "test", round_condition: cur_condition}
+	    	data: {trialNum: testNum, trialType: "test", round_condition: cur_condition, round_number: round_num}
 		};
 	
 		testList.push(test_prompt);
@@ -437,6 +474,11 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 	// };
 	// };
 	
+	//combine all trials into timeline
+	cur_timeline=trainingList.concat(selectList);
+	cur_timeline=cur_timeline.concat(testList);
+	overall_timeline=overall_timeline.concat(cur_timeline);
+	
 };
 
 
@@ -451,14 +493,10 @@ var survey = {
   columns: [70,70,70]
 };
 
-prodTestList.push(survey);
 
 
 
-//combine all trials into timeline
-timeline=trainingList.concat(selectList);
-timeline=timeline.concat(testList);
-timeline=timeline.concat(prodTestList);
+overall_timeline.push(survey);
 //timeline = trainingList;
 //timeline = selectList;
 //timeline = prodTestList;
@@ -560,7 +598,7 @@ function saveData(filename, filedata){
 function startExperiment(){
 	jsPsych.init({
 		display_element: $('#jspsych-target'),
-		timeline: timeline,
+		timeline: overall_timeline,
 		show_progress_bar: true,
 		fullscreen: true,
 		default_iti: 0,

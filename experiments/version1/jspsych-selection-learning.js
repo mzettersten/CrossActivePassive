@@ -27,6 +27,8 @@ jsPsych.plugins['selection-learning'] = (function() {
 	  trial.circleArrayIndex = trial.circleArrayIndex || [0,1,2,3,4,5,6,7];
 	  trial.button_html = trial.button_html || '<button class="jspsych-btn">%choice%</button>';
 	  trial.finalPause = trial.finalPause || 500;
+	  trial.condition  = trial.condition || "passive";
+	  trial.passive_button_html = trial.passive_button_html || '<button class="jspsych-btn">SELECT RANDOM ALIENS</button>';
 	  
       // if any trial variables are functions
       // this evaluates the function and replaces
@@ -140,6 +142,8 @@ jsPsych.plugins['selection-learning'] = (function() {
 	    
 	  var trial_data={};
 	  
+	  if (trial.condition=="active") {
+	  
 	  image1.click(function() {
 	  		  var end_time = (new Date()).getTime();
 	  		  rt = end_time - start_time;
@@ -219,8 +223,40 @@ jsPsych.plugins['selection-learning'] = (function() {
 	  		  choiceIndex = 7;
 	  		  init_learning(choiceIndex,rt);
 	  });
+  } else if (trial.condition=="passive") {
+		  // add button to initiate first random selection
+	      display_element.append('<div id="jspsych-passive-learning-btngroup" class="center-content block-center"></div>')
+		  var str = trial.passive_button_html;
+		  $('#jspsych-passive-learning-btngroup').append(
+	          $(str).attr('id', 'jspsych-passive-learning-button-' + 1).data('choice', 1).addClass('jspsych-passive-learning-button').on('click', function(e) {
+		        // disable all the buttons after a response
+		        $('.jspsych-passive-learning-button').off('click').attr('disabled', 'disabled');
+		  	  	//hide button
+				$('.jspsych-passive-learning-button').hide();
+	            var choice = $('#' + this.id).data('choice');
+  	  		  	var end_time = (new Date()).getTime();
+  	  		  	rt = end_time - start_time;
+				var image_indices = [0,1,2,3,4,5,6,7];
+				choiceIndex=jsPsych.randomization.sample(image_indices,1)[0];
+				choiceKey = trial.imageArrayKey[choiceIndex];
+				var choiceCircle = circleDict[choiceKey];
+				// color in background of randomly selected image
+				setTimeout(function(){
+					choiceCircle.animate({
+		  	  			  fill: "#FFD3D6"
+		  	  		  }, 500,function(){
+					 // initialize second random selection and ready learning trial
+				  	init_learning(choiceIndex,rt);
+				  });
+				  
+				  },500);
+				
+	          })
+	        );
+		};
 	  
 	  function init_learning(choiceIndex,rt) {
+		 if (trial.condition=="active") {
 		  image1.unclick();
 		  image2.unclick();
 		  image3.unclick();
@@ -229,7 +265,10 @@ jsPsych.plugins['selection-learning'] = (function() {
 		  image6.unclick();
 		  image7.unclick();
 		  image8.unclick();
-		  
+	  };
+
+	  console.log(choiceIndex);
+	  console.log(rt);
 		  //choice info
 		  choiceLabel=trial.stims[trial.stimNames[trial.curLocationList[choiceIndex]]]["word"];
 		  choice=trial.stims[trial.stimNames[trial.curLocationList[choiceIndex]]]["image"];
@@ -399,7 +438,8 @@ jsPsych.plugins['selection-learning'] = (function() {
 			"word2": word2,
 			"rt": rt,
 			"learningStartRT": learningStartRT,
-			"trialDuration": trialDuration
+			"trialDuration": trialDuration,
+			"trial_condition": trial.condition
 			
 			
 		};
