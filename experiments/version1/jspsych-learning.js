@@ -127,6 +127,8 @@ jsPsych.plugins['learning'] = (function() {
 			"location2": trial.location2,
 			"image1": trial.im1,
 			"image2": trial.im2,
+			"item_condition1": trial.im1_condition,
+			"item_condition2": trial.im2_condition,
 			"audio": trial.audio	
 		};
 		

@@ -140,7 +140,13 @@ jsPsych.plugins['learning-prompt'] = (function() {
         var trial_data = {
           "rt": response.rt,
           "stimulus": trial.stimulus,
-          "button_pressed": response.button
+          "button_pressed": response.button,
+			"location1": trial.location1,
+			"location2": trial.location2,
+			"image1": trial.im1,
+			"image2": trial.im2,
+			"item_condition1": trial.im1_condition,
+			"item_condition2": trial.im2_condition,
         };
 
         // clear the display

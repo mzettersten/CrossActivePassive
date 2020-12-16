@@ -17,8 +17,9 @@ jsPsych.plugins['selection-learning'] = (function() {
       trial.canvas_size = trial.canvas_size || [1024,700];
       trial.image_size = trial.image_size || [150, 150];
 	  trial.audio = trial.audio || "true";
-	  trial.question = trial.question || "Click on the alien you want to learn about next.";
-	  trial.learningText = trial.learningText || "Click start to hear the names of the aliens in random order."
+	  trial.question1 = trial.question1 || "Click on the alien you want to learn about next.";
+	  trial.question2 = trial.question2 || ""; 
+	  trial.learningText = trial.learningText || "Click start to hear the names of the aliens in random order.";
 	  trial.timing_post_trial = typeof trial.timing_post_trial == 'undefined' ? 500 : trial.timing_post_trial;
 	  trial.duration = trial.duration || 1000;
 	  trial.imageArrayKey = trial.imageArrayKey || ["0","1","2","3","4","5","6","7"];
@@ -27,7 +28,8 @@ jsPsych.plugins['selection-learning'] = (function() {
 	  trial.circleArrayIndex = trial.circleArrayIndex || [0,1,2,3,4,5,6,7];
 	  trial.button_html = trial.button_html || '<button class="jspsych-btn">%choice%</button>';
 	  trial.finalPause = trial.finalPause || 500;
-	  trial.condition  = trial.condition || "passive";
+	  trial.condition  = trial.condition || "active";
+	  trial.passive_selection_index = trial.passive_selection_index; // only used in passive condition
 	  trial.passive_button_html = trial.passive_button_html || '<button class="jspsych-btn">SELECT RANDOM ALIENS</button>';
 	  
       // if any trial variables are functions
@@ -56,6 +58,7 @@ jsPsych.plugins['selection-learning'] = (function() {
 	  var word1 = "NA";
 	  var word2 = "NA";
 	  var curImageArrayIndex = trial.imageArrayIndex;
+	  var item_conditions = [trial.item_condition1,trial.item_condition2,trial.item_condition3,trial.item_condition4,trial.item_condition5,trial.item_condition6,trial.item_condition7,trial.item_condition8]
 	  
 	  
 	  
@@ -125,14 +128,27 @@ jsPsych.plugins['selection-learning'] = (function() {
 	  
 	  var circleImageSet = Snap.set(circle1,circle2,circle3,circle4,circle5,circle6,circle7,circle8,image1,image2,image3,image4,image5,image6,image7,image8);
 	  
-	  
+	  if (trial.condition=="active") {
 	  //add prompt text
 	  //display_element.append(trial.question + trial.label + "?");
-	  var text = paper.text(425, 235, trial.question );
+	  var text = paper.text(425, 235, trial.question1 );
 	  text.attr({
 		  "text-anchor": "middle",
 		  "font-weight": "bold"
 	  });
+  } else if (trial.condition=="passive") {
+	  var text = paper.text(425, 210, trial.question1 );
+	  text.attr({
+		  "text-anchor": "middle",
+		  "font-weight": "bold"
+	  });
+	  var text2 = paper.text(425, 235, trial.question2 );
+	  text2.attr({
+		  "text-anchor": "middle",
+		  "font-weight": "bold"
+	  });
+  	
+  }
 	  //create audio
 	  //var audio = new Audio(trial.audio);
 	  
@@ -236,8 +252,7 @@ jsPsych.plugins['selection-learning'] = (function() {
 	            var choice = $('#' + this.id).data('choice');
   	  		  	var end_time = (new Date()).getTime();
   	  		  	rt = end_time - start_time;
-				var image_indices = [0,1,2,3,4,5,6,7];
-				choiceIndex=jsPsych.randomization.sample(image_indices,1)[0];
+				choiceIndex=trial.passive_selection_index;
 				choiceKey = trial.imageArrayKey[choiceIndex];
 				var choiceCircle = circleDict[choiceKey];
 				// color in background of randomly selected image
@@ -305,6 +320,9 @@ jsPsych.plugins['selection-learning'] = (function() {
 				setTimeout(function(){
 					//fade out choices
 					text.animate({opacity: 0},500,mina.linear);
+					if (trial.condition=="passive") {
+						text2.animate({opacity: 0},500,mina.linear);
+					};
 					circleImageSet.animate({opacity: "0.2"},500,mina.linear, function() {
 						//fade in learning images
 						learningIm.animate({opacity: "1"},500,mina.linear, function() {
@@ -416,33 +434,80 @@ jsPsych.plugins['selection-learning'] = (function() {
 		var final_time = (new Date()).getTime();
 		trialDuration = final_time - start_time;
 		
+		if (trial.condition=="passive") {
+	        var trial_data = {
+				"image1": trial.image1,
+				"image2": trial.image2,
+				"image3": trial.image3,
+				"image4": trial.image4,
+				"image5": trial.image5,
+				"image6": trial.image6,
+				"image7": trial.image7,
+				"image8": trial.image8,
+				"item_condition1": trial.item_condition1,
+				"item_condition2": trial.item_condition2,
+				"item_condition3": trial.item_condition3,
+				"item_condition4": trial.item_condition4,
+				"item_condition5": trial.item_condition5,
+				"item_condition6": trial.item_condition6,
+				"item_condition7": trial.item_condition7,
+				"item_condition8": trial.item_condition8,
+				"randomChoice1": choiceIndex,
+				"randomImage1": choice,
+				"randomItemCondition1": item_conditions[choiceIndex],
+				"randomChoice2": randomIndex,
+				"randomImage2": randomChoice,
+				"randomItemCondition2": item_conditions[randomIndex],
+				"learningLocationRandom1": trial.learningPos[0],
+				"learningLocationRandom2": trial.learningPos[1],
+				"randomLabel1":choiceLabel,
+				"randomLabel2":randomLabel,
+				"word1": word1,
+				"word2": word2,
+				"rt": rt,
+				"learningStartRT": learningStartRT,
+				"trialDuration": trialDuration,
+				"trial_condition": trial.condition
+			};
+		} else if (trial.condition == "active") {
+	        var trial_data = {
+				"image1": trial.image1,
+				"image2": trial.image2,
+				"image3": trial.image3,
+				"image4": trial.image4,
+				"image5": trial.image5,
+				"image6": trial.image6,
+				"image7": trial.image7,
+				"image8": trial.image8,
+				"item_condition1": trial.item_condition1,
+				"item_condition2": trial.item_condition2,
+				"item_condition3": trial.item_condition3,
+				"item_condition4": trial.item_condition4,
+				"item_condition5": trial.item_condition5,
+				"item_condition6": trial.item_condition6,
+				"item_condition7": trial.item_condition7,
+				"item_condition8": trial.item_condition8,
+				"choice": choiceIndex,
+				"choiceImage": choice,
+				"choiceItemCondition": item_conditions[choiceIndex],
+				"randomChoice": randomIndex,
+				"randomImage": randomChoice,
+				"randomItemCondition": item_conditions[randomIndex],
+				"learningLocationChoice": trial.learningPos[0],
+				"learningLocationRandom": trial.learningPos[1],
+				"choiceLabel":choiceLabel,
+				"randomLabel":randomLabel,
+				"word1": word1,
+				"word2": word2,
+				"rt": rt,
+				"learningStartRT": learningStartRT,
+				"trialDuration": trialDuration,
+				"trial_condition": trial.condition
+			};
+		}
+        
 		
-        var trial_data = {
-			"image1": trial.image1,
-			"image2": trial.image2,
-			"image3": trial.image3,
-			"image4": trial.image4,
-			"image5": trial.image5,
-			"image6": trial.image6,
-			"image7": trial.image7,
-			"image8": trial.image8,
-			"choice": choiceIndex,
-			"choiceImage": choice,
-			"randomChoice": randomIndex,
-			"randomImage": randomChoice,
-			"learningLocationChoice": trial.learningPos[0],
-			"learningLocationRandom": trial.learningPos[1],
-			"choiceLabel":choiceLabel,
-			"randomLabel":randomLabel,
-			"word1": word1,
-			"word2": word2,
-			"rt": rt,
-			"learningStartRT": learningStartRT,
-			"trialDuration": trialDuration,
-			"trial_condition": trial.condition
-			
-			
-		};
+		
 		
 
 		setTimeout(function(){
