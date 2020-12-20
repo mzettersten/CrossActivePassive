@@ -183,7 +183,7 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 		var trial_instructions_1 = {
 			type: 'instructions',
 			pages: [
-	  'Welcome to the experiment! In this experiment you will learn names for aliens. There will be few different learning tasks as you go. You will learn the names for two sets of aliens across the entire experiment. You can track how far along you are in the experiment in the progress bar above.<br><br>You will need to hear audio during the experiment, so make sure you are using an up-to-date browser (Firefox, Chrome, or Safari should all be good options). First, we will check that your audio is working properly. We will play you simple words and ask you to type in what you hear. Pay close attention - we will only accept HITs in which people pass this initial audio test. Make sure your audio is turned on, then click NEXT to start the audio test!',
+	  'Welcome to the experiment! In this experiment you will learn names for aliens. There will be a few different tasks as you go. You will learn the names for two sets of aliens across the entire experiment. You can track how far along you are in the experiment in the progress bar above.<br><br>You will need to hear audio during the experiment, so make sure you are using an up-to-date browser (Firefox, Chrome, or Safari should all be good options). First, we will check that your audio is working properly. We will play you simple words and ask you to type in what you hear. Pay close attention - we will only accept HITs in which people pass this initial audio test. Make sure your audio is turned on, then click NEXT to start the audio test!',
 	],
 		show_clickable_nav: true
 	};
@@ -304,9 +304,9 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 			 	audio: "true",
 	    		data: {trialNum: trainingNum, trialType: "learning", round_condition: cur_condition, round_number: round_num}
 	 		};
-			 trainingCTBList.push(trial);
+			 //trainingCTBList.push(trial);
 		};
-		trainingList=trainingList.concat(trainingCTBList);
+		//trainingList=trainingList.concat(trainingCTBList);
 	};
 
 
@@ -322,13 +322,13 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 	if (cur_condition=="active") {
 	var selectionInstr = {
 	type: 'instructions',
-	pages: ['Next, you will get a chance to choose which alien to learn about next. On a trial, you will see all 8 aliens on the screen. Then, you will get to choose which of the 8 aliens you would like to appear in the next learning trial. After you choose an alien, another alien will be chosen at random by the computer. Then, you will see a new learning trial - just like the ones you just saw - with two aliens: the alien you picked and the alien chosen at random. Remember that we will test how well you learned the words later, so try to make choices that will help you learn the names! Click NEXT to get started.'],
+	pages: ['Next, you will get a chance to choose which alien to learn about next. On each trial, you will see all 8 aliens on the screen. Then, you will get to choose which of the 8 aliens you would like to appear in the next learning trial. After you choose an alien, another alien will be chosen at random by the computer. <br><br>Then, you will see a new learning trial - just like the ones you just saw - with two aliens: the alien you picked and the alien chosen at random. Remember that we will test how well you learned the words later, so try to make choices that will help you learn the names! Click NEXT to get started.'],
 	show_clickable_nav: true
 	}
 	} else if (cur_condition=="passive") {
 		var selectionInstr = {
 		type: 'instructions',
-		pages: ['Next, you will get a chance to learn more about the names of the aliens. On a trial, you will see all 8 aliens on the screen. Next, two aliens will be chosen at random by the computer. Then, you will see a new learning trial - just like the ones you just saw - with these two aliens chosen. Remember that we will test how well you learned the words later, so try to learn the names! Click NEXT to get started.'],
+		pages: ['Next, you will get a chance to learn more about the names of the aliens. On each trial, you will see all 8 aliens on the screen. Next, two aliens will be chosen at random by the computer. <br><br>Then, you will see a new learning trial - just like the ones you just saw - with these two aliens. Remember that we will test how well you learned the words later, so try to learn the names! Click NEXT to get started.'],
 		show_clickable_nav: true
 		}
 	}
@@ -415,7 +415,7 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 	var testList=[];
 	var numLabelTestTrialsPerBlock = 8;
 	var testTrialsIndex=[0,1,2,3,4,5,6,7];
-	var numTestBlocks = 1;
+	var numTestBlocks = 2;
 	var testNum = 1;
 
 	// start with instructions about the label test
@@ -468,7 +468,7 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 				targetLocation: curTargetIndex,
 				targetImage: stims[stimNames[curTargetIndex]]["image"],
 			choices: ['START'],
-		    	data: {trialNum: testNum, trialType: "test-prompt",round_condition: cur_condition, round_number: round_num}
+		    	data: {trialNum: testNum, block: i+1, trialType: "test-prompt",round_condition: cur_condition, round_number: round_num}
 		};
 		
 		var test = {
@@ -493,7 +493,7 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 				target_item_condition: stims[stimNames[curTargetIndex]]["item_condition"],
 				targetLocation: curTargetIndex,
 				targetImage: stims[stimNames[curTargetIndex]]["image"],
-	    	data: {trialNum: testNum, trialType: "test", round_condition: cur_condition, round_number: round_num}
+	    	data: {trialNum: testNum, block: i+1, trialType: "test", round_condition: cur_condition, round_number: round_num}
 		};
 	
 		testList.push(test_prompt);
