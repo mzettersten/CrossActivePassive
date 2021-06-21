@@ -49,7 +49,7 @@ Math.seedrandom(random_seed);
 // generate a random subject ID (just to be safe)
 var subject_id = Math.floor(Math.random()*1000000);
 subject_id="p"+subject_id.toString();
-console.log(subject_id);
+//console.log(subject_id);
 
 
 
@@ -108,7 +108,7 @@ for (p=0; p<num_select_trials; p++) {
 	var cur_passive_choice_index=jsPsych.randomization.sampleWithReplacement(image_indices,1)[0];
 	passive_choice_index.push(cur_passive_choice_index);
 }
-console.log(passive_choice_index);
+//console.log(passive_choice_index);
 
 //create round stimuli
 var total_rounds = 2;
@@ -126,9 +126,9 @@ for (cur_round=0; cur_round<total_rounds; cur_round++) {
 	round_audio_check.push(subset_round_audio_check);
 }
 
-console.log(round_items);
-console.log(round_words);
-console.log(round_audio_check);
+//console.log(round_items);
+//console.log(round_words);
+//console.log(round_audio_check);
 
 // TWO EXPERIMENTAL ROUNDS
 var overall_timeline = []
@@ -165,7 +165,7 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 		//add this dictionary to the overall stimulus dictionary
 		stims[stimNames[i]] = curObject;
 	};
-	console.log(stims);
+	//console.log(stims);
 
 	// DEFINE TRAINING TRIALS
 
@@ -250,8 +250,8 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 	var numTrialsCTB = 12; // nr of trials per Cross sit training block
 	var trainingNum = 1; // counter for trialnr
 
-	console.log(specifiedStim);
-	console.log(specifiedStimShuffled);
+	//console.log(specifiedStim);
+	//console.log(specifiedStimShuffled);
 
 	for (j = 0; j < numTB;  j++){
 		// initialize list for this block of training trials
@@ -277,9 +277,9 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 			var locationShuffled = jsPsych.randomization.shuffle(possibleLocations);
 			var wordOrderShuffled = jsPsych.randomization.shuffle(wordOrderDummy);
 		
-			console.log(stims);
-			console.log(currentStims);
-			console.log(stimNames);
+			//console.log(stims);
+			//console.log(currentStims);
+			//console.log(stimNames);
 		
 		 	var prompt = {
 	 			type: 'learning-prompt',
@@ -576,6 +576,9 @@ var survey = {
 //timeline = prodTestList;
 
 overall_timeline=[fullscreen,trial_instructions_1,trial_instructions_2];
+overall_timeline=overall_timeline.concat(selectList);
+overall_timeline=selectList
+console.log(overall_timeline)
 
 // CREATE FINAL EXPERIMENT MESSAGE/ DEBRIEF AFTER DATA SUCCESSFULLY STORED
 // including a random code participants can use to confirm they took the study (for payment on Amazon Mechanical Turk)

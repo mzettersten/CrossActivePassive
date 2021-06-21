@@ -1,6 +1,6 @@
 /**
- * crossPC - test
- * plugin for comprehension test trials in cross-situational word learning study (production vs. comprehension, crossPC)
+ * Selection Learning
+ * plugin for active selection trials in cross-situational word learning study (crossAct, crossActivePassive)
  * Martin Zettersten
  */
 
@@ -10,35 +10,115 @@ jsPsych.plugins['selection-learning'] = (function() {
   
   jsPsych.pluginAPI.registerPreload('selection-learning', ['image1','image2','image3','image4','image5','image6','image7','image8'], 'image');
   jsPsych.pluginAPI.registerPreload('selection-learning', ['label1','label2','label3','label4','label5','label6','label7','label8'], 'audio');
+  
+  plugin.info = {
+    name: 'selection-learning',
+    description: '',
+    parameters: {
+        canvas_size: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'Canvas size',
+          array: true,
+          default: [1024,700],
+          description: 'Array specifying the width and height of the area that the animation will display in.'
+        },
+        image_size: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'Image size',
+          array: true,
+          default: [150,150],
+          description: 'Array specifying the width and height of the images to show.'
+        },
+      audio: {
+        type: jsPsych.plugins.parameterType.STRING,
+        pretty_name: 'Audio?',
+        default: "true",
+        description: 'If true, audio is played.'
+      },
+     question1: {
+        type: jsPsych.plugins.parameterType.STRING,
+        pretty_name: 'Question 1',
+        default: "Click on the alien you want to learn about next.",
+        description: 'Selection instructions'
+      },
+	  question2: {
+         type: jsPsych.plugins.parameterType.STRING,
+         pretty_name: 'Question 2',
+         default: null,
+         description: 'prompt text'
+       },
+ 	  learningText: {
+          type: jsPsych.plugins.parameterType.STRING,
+          pretty_name: 'Learning Text',
+          default: 'Click start to hear the names of the aliens in random order.',
+          description: 'prompt text'
+        },
+        finalPause: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'Final pause',
+          default: 500,
+          description: 'ITI at the end of the trial.'
+        },
+        duration: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'Audio duration',
+          default: 1000,
+          description: 'Audio Duration'
+        },
+        imageArrayKey: {
+          type: jsPsych.plugins.parameterType.STRING,
+          pretty_name: 'Image Array Key',
+          default: ["0","1","2","3","4","5","6","7"],
+          array: true,
+          description: 'Key to image array/ dictionary'
+        },
+        circleArrayKey: {
+          type: jsPsych.plugins.parameterType.STRING,
+          pretty_name: 'Circle Array Key',
+          default: ["0","1","2","3","4","5","6","7"],
+          array: true,
+          description: 'Key to image array/ dictionary'
+        },
+        imageArrayIndex: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'Image Array Index',
+          default: [0,1,2,3,4,5,6,7],
+			array: true,
+          description: 'Indices for image array.'
+        },
+        circleArrayIndex: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'Circle Array Index',
+          default: [0,1,2,3,4,5,6,7],
+			array: true,
+          description: 'Indices for circle array.'
+        },
+        condition: {
+          type: jsPsych.plugins.parameterType.STRING,
+          pretty_name: 'Condition',
+          default: "active",
+          description: 'Condition label.'
+        },
+		passive_selection_index: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'Passive Selection Index',
+          default: null,
+          description: 'Index in passive condition.'
+        },
+        passive_button_html: {
+          type: jsPsych.plugins.parameterType.HTML_STRING,
+          pretty_name: 'Passi e Button HTML',
+          default: '<button class="jspsych-btn">SELECT RANDOM ALIENS</button>',
+          array: true,
+          description: 'Passive condition button.'
+        }
+    }
+  }
 
   plugin.trial = function(display_element, trial) {
 	  
-      // default values
-      trial.canvas_size = trial.canvas_size || [1024,700];
-      trial.image_size = trial.image_size || [150, 150];
-	  trial.audio = trial.audio || "true";
-	  trial.question1 = trial.question1 || "Click on the alien you want to learn about next.";
-	  trial.question2 = trial.question2 || ""; 
-	  trial.learningText = trial.learningText || "Click start to hear the names of the aliens in random order.";
-	  trial.timing_post_trial = typeof trial.timing_post_trial == 'undefined' ? 500 : trial.timing_post_trial;
-	  trial.duration = trial.duration || 1000;
-	  trial.imageArrayKey = trial.imageArrayKey || ["0","1","2","3","4","5","6","7"];
-	  trial.circleArrayKey = trial.circleArrayKey || ["0","1","2","3","4","5","6","7"];
-	  trial.imageArrayIndex = trial.imageArrayIndex || [0,1,2,3,4,5,6,7];
-	  trial.circleArrayIndex = trial.circleArrayIndex || [0,1,2,3,4,5,6,7];
-	  trial.button_html = trial.button_html || '<button class="jspsych-btn">%choice%</button>';
-	  trial.finalPause = trial.finalPause || 500;
-	  trial.condition  = trial.condition || "active";
-	  trial.passive_selection_index = trial.passive_selection_index; // only used in passive condition
-	  trial.passive_button_html = trial.passive_button_html || '<button class="jspsych-btn">SELECT RANDOM ALIENS</button>';
+      display_element.innerHTML = "<svg id='jspsych-test-canvas' width=" + trial.canvas_size[0] + " height=" + trial.canvas_size[1] + "></svg>";
 	  
-      // if any trial variables are functions
-      // this evaluates the function and replaces
-      // it with the output of the function
-      trial = jsPsych.pluginAPI.evaluateFunctionParameters(trial);
-	  
-	  display_element.append($("<svg id='jspsych-test-canvas' width=" + trial.canvas_size[0] + " height=" + trial.canvas_size[1] + "></svg>"));
-
       var paper = Snap("#jspsych-test-canvas");	  
 	  
 	  
@@ -106,6 +186,19 @@ jsPsych.plugins['selection-learning'] = (function() {
 		  stroke: "#000",
 		  strokeWidth: 5,
 		  opacity: 0
+	  });
+	  
+	  var label1 = paper.text(425, 125, "");
+	  label1.attr({
+		  opacity: 0,
+		  "text-anchor": "middle",
+		  "font-weight": "bold"
+	  });
+	  var label2 = paper.text(425, 125, "");
+	  label2.attr({
+		  opacity: 0,
+		  "text-anchor": "middle",
+		  "font-weight": "bold"
 	  });
 
 	  
@@ -240,34 +333,39 @@ jsPsych.plugins['selection-learning'] = (function() {
 	  		  init_learning(choiceIndex,rt);
 	  });
   } else if (trial.condition=="passive") {
-		  // add button to initiate first random selection
-	      display_element.append('<div id="jspsych-passive-learning-btngroup" class="center-content block-center"></div>')
-		  var str = trial.passive_button_html;
-		  $('#jspsych-passive-learning-btngroup').append(
-	          $(str).attr('id', 'jspsych-passive-learning-button-' + 1).data('choice', 1).addClass('jspsych-passive-learning-button').on('click', function(e) {
-		        // disable all the buttons after a response
-		        $('.jspsych-passive-learning-button').off('click').attr('disabled', 'disabled');
-		  	  	//hide button
-				$('.jspsych-passive-learning-button').hide();
-	            var choice = $('#' + this.id).data('choice');
-  	  		  	var end_time = (new Date()).getTime();
-  	  		  	rt = end_time - start_time;
-				choiceIndex=trial.passive_selection_index;
-				choiceKey = trial.imageArrayKey[choiceIndex];
-				var choiceCircle = circleDict[choiceKey];
-				// color in background of randomly selected image
-				setTimeout(function(){
-					choiceCircle.animate({
-		  	  			  fill: "#FFD3D6"
-		  	  		  }, 500,function(){
-					 // initialize second random selection and ready learning trial
-				  	init_learning(choiceIndex,rt);
-				  });
-				  
-				  },500);
-				
-	          })
-	        );
+	// add button to initiate first random selection
+      var html = '<div id="jspsych-passive-learning-btngroup" class="center-content block-center">';
+      var str = trial.passive_button_html;
+      html += '<div class="jspsych-passive-learning-button" id="jspsych-passive-learning-button-' + 1 + '" data-choice="' + 1 + '">' + str + '</div>';
+      html += '</div>';
+      // update the page content
+      display_element.innerHTML += html;
+	  display_element.querySelector('#jspsych-passive-learning-button-' + 1).addEventListener('click', function(e){
+          var choice = e.currentTarget.getAttribute('data-choice'); // don't use dataset for jsdom compatibility
+        	// disable all the buttons after a response
+        	display_element.querySelector('#jspsych-passive-learning-button-' + 1).setAttribute('disabled', 'disabled');	
+			//hide button
+			display_element.querySelector('#jspsych-passive-learning-button-' + 1).style.display = 'none';
+
+  		  	var end_time = (new Date()).getTime();
+  		  	rt = end_time - start_time;
+			choiceIndex=trial.passive_selection_index;
+			choiceKey = trial.imageArrayKey[choiceIndex];
+			var choiceCircle = circleDict[choiceKey];
+			
+			// color in background of randomly selected image
+			setTimeout(function(){
+				choiceCircle.animate({
+	  	  			  fill: "#FFD3D6"
+	  	  		  }, 500,function(){
+				 // initialize second random selection and ready learning trial
+			  	init_learning(choiceIndex,rt);
+			  });
+			  
+			  },500);
+			
+        });
+		  
 		};
 	  
 	  function init_learning(choiceIndex,rt) {
@@ -294,7 +392,7 @@ jsPsych.plugins['selection-learning'] = (function() {
 		  curImageArrayIndex.splice(choiceIndex, 1);
 		  
 		  //make random choice
-		  randomIndex=jsPsych.randomization.sample(curImageArrayIndex,1)[0];
+		  randomIndex=jsPsych.randomization.sampleWithReplacement(curImageArrayIndex,1)[0];
 		  randomKey = trial.imageArrayKey[randomIndex]
 	  
 		  //random choice info
@@ -357,54 +455,50 @@ jsPsych.plugins['selection-learning'] = (function() {
 			  word2 = choiceLabel;
 			  word1 = randomLabel;
 		  }
-		  var label1 = paper.text(425, 125, word1);
 		  label1.attr({
-			  opacity: 0,
-			  "text-anchor": "middle",
-			  "font-weight": "bold"
+			   "text": word1
 		  });
-		  var label2 = paper.text(425, 125, word2);
 		  label2.attr({
-			  opacity: 0,
-			  "text-anchor": "middle",
-			  "font-weight": "bold"
+			  "text": word2
 		  });
 		  
 		  //display buttons
-	      var buttons = [];
-	      if (Array.isArray(trial.button_html)) {
-	        if (trial.button_html.length == trial.choices.length) {
-	          buttons = trial.button_html;
-	        } else {
-	          console.error('Error in selection-learning plugin. The length of the button_html array does not equal the length of the choices array');
-	        }
-	      } else {
-	        for (var i = 0; i < trial.choices.length; i++) {
-	          buttons.push(trial.button_html);
-	        }
-	      }
-	      display_element.append('<div id="jspsych-selection-learning-btngroup" class="center-content block-center"></div>')
-	      for (var i = 0; i < trial.choices.length; i++) {
-	        var str = buttons[i].replace(/%choice%/g, trial.choices[i]);
-	        $('#jspsych-selection-learning-btngroup').append(
-	          $(str).attr('id', 'jspsych-selection-learning-button-' + i).data('choice', i).addClass('jspsych-selection-learning-button').on('click', function(e) {
-		        // disable all the buttons after a response
-		        $('.jspsych-selection-learning-button').off('click').attr('disabled', 'disabled');
-		  	  	//hide button
-				$('.jspsych-selection-learning-button').hide();
-	            var choice = $('#' + this.id).data('choice');
-		        var curTime = Date.now();
-		        var learningStartRT = curTime - learningStartTime;
-	            playAudio(label1,label2);
-	          })
-	        );
-	      };
+		  var button_block= paper.rect(385, 100, 80, 40, 10, 10);
+
+		  button_block.attr({
+		      fill: "rgb(236, 240, 241)",
+		      stroke: "#1f2c39",
+		      strokeWidth: 3
+		  });
+		  var button_text = paper.text(425,125, "START");
+		  button_text.attr({
+			  "text-anchor": "middle",
+			  "font-weight": "bold"
+		  });
+		  var button_block_cover= paper.rect(385, 100, 80, 40, 10, 10);
+		  button_block_cover.attr({
+		      fill: "rgb(236, 240, 241)",
+		      stroke: "#1f2c39",
+		      strokeWidth: 3,
+			  opacity: 0
+		  });
+		  
+		  var button = paper.g(button_block,button_text,button_block_cover);
+		  
+		  button.click(function() {
+			  button.unclick();
+			  button.attr({
+				  opacity: 0,
+			  })
+	        var curTime = Date.now();
+	        var learningStartRT = curTime - learningStartTime;
+            playAudio();
+		  });
 		  
 	  };
 
 
-	  function playAudio(label1,label2) {
-          
+	  function playAudio() {
 		  if (trial.audio == "true") {
 			  //create audio
 			  var audio1 = new Audio("stims/"+word1+".m4a");
@@ -428,7 +522,7 @@ jsPsych.plugins['selection-learning'] = (function() {
 				});
 			});
 		});
-	  };
+	};
 	  
       function endTrial() {
 		var final_time = (new Date()).getTime();
@@ -511,7 +605,7 @@ jsPsych.plugins['selection-learning'] = (function() {
 		
 
 		setTimeout(function(){
-			display_element.html('');
+			display_element.innerHTML = '';
 			jsPsych.finishTrial(trial_data);
 		},trial.finalPause);
 		
