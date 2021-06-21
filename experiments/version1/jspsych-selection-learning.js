@@ -104,13 +104,6 @@ jsPsych.plugins['selection-learning'] = (function() {
           pretty_name: 'Passive Selection Index',
           default: null,
           description: 'Index in passive condition.'
-        },
-        passive_button_html: {
-          type: jsPsych.plugins.parameterType.HTML_STRING,
-          pretty_name: 'Passi e Button HTML',
-          default: '<button class="jspsych-btn">SELECT RANDOM ALIENS</button>',
-          array: true,
-          description: 'Passive condition button.'
         }
     }
   }
@@ -333,38 +326,51 @@ jsPsych.plugins['selection-learning'] = (function() {
 	  		  init_learning(choiceIndex,rt);
 	  });
   } else if (trial.condition=="passive") {
-	// add button to initiate first random selection
-      var html = '<div id="jspsych-passive-learning-btngroup" class="center-content block-center">';
-      var str = trial.passive_button_html;
-      html += '<div class="jspsych-passive-learning-button" id="jspsych-passive-learning-button-' + 1 + '" data-choice="' + 1 + '">' + str + '</div>';
-      html += '</div>';
-      // update the page content
-      display_element.innerHTML += html;
-	  display_element.querySelector('#jspsych-passive-learning-button-' + 1).addEventListener('click', function(e){
-          var choice = e.currentTarget.getAttribute('data-choice'); // don't use dataset for jsdom compatibility
-        	// disable all the buttons after a response
-        	display_element.querySelector('#jspsych-passive-learning-button-' + 1).setAttribute('disabled', 'disabled');	
-			//hide button
-			display_element.querySelector('#jspsych-passive-learning-button-' + 1).style.display = 'none';
+	  // add button to initiate first random selection
+	  var passive_button_block= paper.rect(310, 140, 230, 40, 10, 10);
 
-  		  	var end_time = (new Date()).getTime();
-  		  	rt = end_time - start_time;
-			choiceIndex=trial.passive_selection_index;
-			choiceKey = trial.imageArrayKey[choiceIndex];
-			var choiceCircle = circleDict[choiceKey];
-			
-			// color in background of randomly selected image
-			setTimeout(function(){
-				choiceCircle.animate({
-	  	  			  fill: "#FFD3D6"
-	  	  		  }, 500,function(){
-				 // initialize second random selection and ready learning trial
-			  	init_learning(choiceIndex,rt);
-			  });
-			  
-			  },500);
-			
-        });
+	  passive_button_block.attr({
+	      fill: "rgb(236, 240, 241)",
+	      stroke: "#1f2c39",
+	      strokeWidth: 3
+	  });
+	  var passive_button_text = paper.text(425,165, "SELECT RANDOM ALIENS");
+	  passive_button_text.attr({
+		  "text-anchor": "middle",
+		  "font-weight": "bold"
+	  });
+	  var passive_button_block_cover= paper.rect(310, 140, 230, 40, 10, 10);
+	  passive_button_block_cover.attr({
+	      fill: "rgb(236, 240, 241)",
+	      stroke: "#1f2c39",
+	      strokeWidth: 3,
+		  opacity: 0
+	  });
+	  
+	  var passive_button = paper.g(passive_button_block,passive_button_text,passive_button_block_cover);
+	  
+	  passive_button.click(function() {
+		  passive_button.unclick();
+		  passive_button.attr({
+			  opacity: 0,
+		  });
+		  	var end_time = (new Date()).getTime();
+		  	rt = end_time - start_time;
+		choiceIndex=trial.passive_selection_index;
+		choiceKey = trial.imageArrayKey[choiceIndex];
+		var choiceCircle = circleDict[choiceKey];
+		
+		// color in background of randomly selected image
+		setTimeout(function(){
+			choiceCircle.animate({
+  	  			  fill: "#FFD3D6"
+  	  		  }, 500,function(){
+			 // initialize second random selection and ready learning trial
+		  	init_learning(choiceIndex,rt);
+		  });
+		  
+		  },500);
+	  })
 		  
 		};
 	  
