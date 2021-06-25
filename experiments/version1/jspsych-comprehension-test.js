@@ -17,25 +17,43 @@ jsPsych.plugins['comprehension-test'] = (function() {
   jsPsych.pluginAPI.registerPreload('comprehension-test-prompt', 'image7', 'image');
   jsPsych.pluginAPI.registerPreload('comprehension-test-prompt', 'image8', 'image');
 
+  plugin.info = {
+    name: 'comprehension-test',
+    description: '',
+    parameters: {
+        canvas_size: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'Canvas size',
+          array: true,
+          default: [1024,700],
+          description: 'Array specifying the width and height of the area that the animation will display in.'
+        },
+        image_size: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'Image size',
+          array: true,
+          default: [150,150],
+          description: 'Array specifying the width and height of the images to show.'
+        },
+     question: {
+        type: jsPsych.plugins.parameterType.STRING,
+        pretty_name: 'question',
+        default: "Click on the ",
+        description: 'trial instructions'
+      },
+      label: {
+         type: jsPsych.plugins.parameterType.STRING,
+         pretty_name: 'label',
+         default: "kita",
+         description: 'Test label'
+       }
+    }
+  }
+
   plugin.trial = function(display_element, trial) {
 	  
-      // default values
-      trial.canvas_size = trial.canvas_size || [1024,700];
-      trial.image_size = trial.image_size || [150, 150];
-	  //trial.audio = trial.audio || "stims/bleep.wav";
-	  trial.label = trial.label || "kita";
-	  trial.question = trial.question || "Click on the ";
-	  trial.timing_post_trial = typeof trial.timing_post_trial == 'undefined' ? 500 : trial.timing_post_trial;
+      display_element.innerHTML = "<svg id='jspsych-test-canvas' width=" + trial.canvas_size[0] + " height=" + trial.canvas_size[1] + "></svg>";
 	  
-	  
-	  
-      // if any trial variables are functions
-      // this evaluates the function and replaces
-      // it with the output of the function
-      trial = jsPsych.pluginAPI.evaluateFunctionParameters(trial);
-	  
-	  display_element.append($("<svg id='jspsych-test-canvas' width=" + trial.canvas_size[0] + " height=" + trial.canvas_size[1] + "></svg>"));
-
       var paper = Snap("#jspsych-test-canvas");
 	  
 	  var circle1 = paper.circle(125, 325, 90);
@@ -292,7 +310,7 @@ jsPsych.plugins['comprehension-test'] = (function() {
 		
 
 		setTimeout(function(){
-			display_element.html('');
+			display_element.innerHTML = '';
 			jsPsych.finishTrial(trial_data);
 		},500);
 		

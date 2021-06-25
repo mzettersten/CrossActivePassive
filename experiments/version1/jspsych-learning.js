@@ -14,7 +14,7 @@ jsPsych.plugins['learning'] = (function() {
   jsPsych.pluginAPI.registerPreload('learning', 'audio2', 'audio');
 
   plugin.info = {
-    name: 'selection-learning',
+    name: 'learning',
     description: '',
     parameters: {
         canvas_size: {

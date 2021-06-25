@@ -17,7 +17,7 @@ jsPsych.plugins['learning-prompt'] = (function() {
   jsPsych.pluginAPI.registerPreload('learning', 'im3', 'image');
 
   plugin.info = {
-    name: 'selection-learning',
+    name: 'learning-prompt',
     description: '',
     parameters: {
         canvas_size: {

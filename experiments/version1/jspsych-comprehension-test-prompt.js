@@ -17,25 +17,54 @@ jsPsych.plugins['comprehension-test-prompt'] = (function() {
   jsPsych.pluginAPI.registerPreload('comprehension-test-prompt', 'image7', 'image');
   jsPsych.pluginAPI.registerPreload('comprehension-test-prompt', 'image8', 'image');
 
+  plugin.info = {
+    name: 'comprehension-test-prompt',
+    description: '',
+    parameters: {
+        canvas_size: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'Canvas size',
+          array: true,
+          default: [1024,700],
+          description: 'Array specifying the width and height of the area that the animation will display in.'
+        },
+        image_size: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'Image size',
+          array: true,
+          default: [150,150],
+          description: 'Array specifying the width and height of the images to show.'
+        },
+     question: {
+        type: jsPsych.plugins.parameterType.STRING,
+        pretty_name: 'question',
+        default: "Click on the START button to begin the trial.",
+        description: 'trial instructions'
+      },
+      label: {
+         type: jsPsych.plugins.parameterType.STRING,
+         pretty_name: 'label',
+         default: "kita",
+         description: 'Test label'
+       },
+        timing_response: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'timing response',
+          default: -1, // if -1, then wait for response forever
+          description: 'For setting a trial duration limit'
+        },
+		response_ends_trial: {
+          type: jsPsych.plugins.parameterType.BOOL,
+          pretty_name: 'response ends trial',
+          default: true,
+          description: 'Whether or not a response ends the trial'
+        }
+    }
+  }
+
   plugin.trial = function(display_element, trial) {
 	  
-      // default values
-	  trial.button_html = trial.button_html || '<button class="jspsych-btn">%choice%</button>';
-      trial.canvas_size = trial.canvas_size || [1024,700];
-      trial.image_size = trial.image_size || [150, 150];
-	  //trial.audio = trial.audio || "stims/bleep.wav";
-	  trial.label = trial.label || "kita";
-	  trial.question = trial.question || "Click on the START button to begin the trial.";
-	  trial.timing_post_trial = typeof trial.timing_post_trial == 'undefined' ? 0 : trial.timing_post_trial;
-	  
-	  
-	  
-      // if any trial variables are functions
-      // this evaluates the function and replaces
-      // it with the output of the function
-      trial = jsPsych.pluginAPI.evaluateFunctionParameters(trial);
-	  
-	  display_element.append($("<svg id='jspsych-test-canvas' width=" + trial.canvas_size[0] + " height=" + trial.canvas_size[1] + "></svg>"));
+      display_element.innerHTML = "<svg id='jspsych-test-canvas' width=" + trial.canvas_size[0] + " height=" + trial.canvas_size[1] + "></svg>";
 
       var paper = Snap("#jspsych-test-canvas");
 	  
@@ -135,29 +164,36 @@ jsPsych.plugins['comprehension-test-prompt'] = (function() {
 	  //var audio = new Audio(trial.audio);
 	  
 	  //display buttons
-      var buttons = [];
-      if (Array.isArray(trial.button_html)) {
-        if (trial.button_html.length == trial.choices.length) {
-          buttons = trial.button_html;
-        } else {
-          console.error('Error in button-response plugin. The length of the button_html array does not equal the length of the choices array');
-        }
-      } else {
-        for (var i = 0; i < trial.choices.length; i++) {
-          buttons.push(trial.button_html);
-        }
-      }
-	  console.log(buttons);
-      display_element.append('<div id="jspsych-comp-test-prompt-btngroup" class="center-content block-center"></div>')
-      for (var i = 0; i < trial.choices.length; i++) {
-        var str = buttons[i].replace(/%choice%/g, trial.choices[i]);
-        $('#jspsych-comp-test-prompt-btngroup').append(
-          $(str).attr('id', 'jspsych-button-response-button-' + i).data('choice', i).addClass('jspsych-button-response-button').on('click', function(e) {
-            var choice = $('#' + this.id).data('choice');
-            after_response(choice);
-          })
-        );
-      };
+	  var button_block= paper.rect(360, 200, 80, 40, 10, 10);
+
+	  button_block.attr({
+	      fill: "rgb(236, 240, 241)",
+	      stroke: "#1f2c39",
+	      strokeWidth: 3
+	  });
+	  var button_text = paper.text(400,225, "START");
+	  button_text.attr({
+		  "text-anchor": "middle",
+		  "font-weight": "bold"
+	  });
+	  var button_block_cover= paper.rect(360, 200, 80, 40, 10, 10);
+	  button_block_cover.attr({
+	      fill: "rgb(236, 240, 241)",
+	      stroke: "#1f2c39",
+	      strokeWidth: 3,
+		  opacity: 0
+	  });
+	  
+	  var button = paper.g(button_block,button_text,button_block_cover);
+	  
+	  button.click(function() {
+		  button.unclick();
+		  button.attr({
+			  opacity: 0,
+		  })
+		var choice = "start"
+        after_response(choice)
+	  });
 
 	  var rt = "NA";
 	  
@@ -168,11 +204,6 @@ jsPsych.plugins['comprehension-test-prompt'] = (function() {
 	  function after_response(choice) {
 		  var end_time = (new Date()).getTime();
 		  rt = end_time - start_time;
-		  
-		  $("#jspsych-button-response-stimulus").addClass('responded');
-		  // disable all the buttons after a response
-	      //$('.jspsych-button-response-button').off('click').attr('disabled', 'disabled');
-		  $('.jspsych-button-response-button').attr('disabled', 'disabled');
 		  endTrial();
 	
 	  };
@@ -204,7 +235,7 @@ jsPsych.plugins['comprehension-test-prompt'] = (function() {
 			"rt": rt
 		};
 		
-  		display_element.html('');
+  		display_element.innerHTML = '';
   		jsPsych.finishTrial(trial_data);
 	};
   	
