@@ -13,32 +13,88 @@ jsPsych.plugins['learning'] = (function() {
   jsPsych.pluginAPI.registerPreload('learning', 'audio1', 'audio');
   jsPsych.pluginAPI.registerPreload('learning', 'audio2', 'audio');
 
+  plugin.info = {
+    name: 'selection-learning',
+    description: '',
+    parameters: {
+        canvas_size: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'Canvas size',
+          array: true,
+          default: [1024,700],
+          description: 'Array specifying the width and height of the area that the animation will display in.'
+        },
+        image_size: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'Image size',
+          array: true,
+          default: [150,150],
+          description: 'Array specifying the width and height of the images to show.'
+        },
+        location1: {
+           type: jsPsych.plugins.parameterType.STRING,
+           pretty_name: 'Location 1',
+           default: "left",
+           description: 'First location'
+         },
+   	  location2: {
+            type: jsPsych.plugins.parameterType.STRING,
+            pretty_name: 'Location 2',
+            default: "right",
+            description: 'Second location'
+          },
+          label1: {
+             type: jsPsych.plugins.parameterType.STRING,
+             pretty_name: 'Label 1',
+             default: null,
+             description: 'First label'
+           },
+     	  label2: {
+              type: jsPsych.plugins.parameterType.STRING,
+              pretty_name: 'Label 2',
+              default: null,
+              description: 'Second label'
+            },
+      audio: {
+        type: jsPsych.plugins.parameterType.STRING,
+        pretty_name: 'Audio',
+        default: "true",
+        description: 'If true, audio is played.'
+      },
+      audio1: {
+        type: jsPsych.plugins.parameterType.AUDIO,
+        pretty_name: 'Audio 1',
+        default: undefined,
+        description: 'The first audio to be played.'
+      },
+      audio2: {
+        type: jsPsych.plugins.parameterType.AUDIO,
+        pretty_name: 'Audio 2',
+        default: undefined,
+        description: 'The second audio to be played.'
+      },
+     prompt: {
+        type: jsPsych.plugins.parameterType.STRING,
+        pretty_name: 'prompt',
+        default: "Learn the names for the two aliens!",
+        description: 'trial instructions'
+      },
+        duration: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'Audio duration',
+          default: 1000,
+          description: 'Audio Duration'
+        }
+    }
+  }
+
   plugin.trial = function(display_element, trial) {
 	  
-      // default values
-      trial.canvas_size = trial.canvas_size || [1024,700];
-      trial.image_size = trial.image_size || [150, 150];
-	  trial.location1 = trial.location1 || "bottom";
-	  trial.location2 = trial.location2 || "topRight";
-	  trial.label1 = trial.label1 || "kita";
-	  trial.label2 = trial.label2 || "kita";
-	  trial.audio1 = trial.audio1 || "norm_kita.m4a";
-	  trial.audio2 = trial.audio2 || "norm_kita.m4a";
-	  trial.duration = trial.duration || 1000;
-	  trial.prompt = trial.prompt || "Learn the names for the two aliens!";
-	  trial.audio = trial.audio || "false";
-	  trial.timing_post_trial = typeof trial.timing_post_trial == 'undefined' ? 500 : trial.timing_post_trial;
-	  
-	  
-	  
-      // if any trial variables are functions
-      // this evaluates the function and replaces
-      // it with the output of the function
-      trial = jsPsych.pluginAPI.evaluateFunctionParameters(trial);
-	  
-	  display_element.append($("<svg id='jspsych-test-canvas' width=" + trial.canvas_size[0] + " height=" + trial.canvas_size[1] + "></svg>"));
+      display_element.innerHTML = "<svg id='jspsych-test-canvas' width=" + trial.canvas_size[0] + " height=" + trial.canvas_size[1] + "></svg>";
 
       var paper = Snap("#jspsych-test-canvas");
+	  
+	  console.log("starting to stop")
 	  
 	  var topLeftCircle = paper.circle(250, 225, 90);
 	  topLeftCircle.attr({
@@ -132,7 +188,7 @@ jsPsych.plugins['learning'] = (function() {
 			"audio": trial.audio	
 		};
 		
-		display_element.html('');
+		display_element.innerHTML = '';
 		jsPsych.finishTrial(trial_data);
 		
       };

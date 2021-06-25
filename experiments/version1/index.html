@@ -12,13 +12,11 @@
 	<script src="plugins/jspsych-fullscreen.js"></script>
   	<script src="jspsych-learning.js"></script>
 	<script src="jspsych-learning-prompt.js"></script>
-	<script src="jspsych-production-test-singlepic.js"></script>
 	<script src="jspsych-comprehension-test-prompt.js"></script>
 	<script src="jspsych-comprehension-test.js"></script>
 	<script src="jspsych-selection-learning.js"></script>
 	<script src="jspsych-audio-check.js"></script>
   	<script src="plugins/jspsych-survey-text.js"></script>
-	<script src="jspsych-production-test-singlepic.js"></script>
     <link rel="stylesheet" href="css/jspsych.css"></link>
 	<link rel="stylesheet" href="css/jquery-ui.css"></link>
     <link rel="stylesheet" href="css/crossact.css"></link>
@@ -224,11 +222,12 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 
 	var audio_check = {
 		type: 'audio-check',
-		prompt: "Click on the Play button to hear an audio recording. Then enter the word you heard. Click the button to hear the sound again. Click on the Submit Answers button when you are finished <br>",
+		prompt: "Click on the Play button to hear an audio recording. Then enter the word you heard. Click the button to hear the sound again. <br> Click on the Submit Answers button when you are finished.<br> <br>",
 		timeline: [
 			{stimulus: 'stims/'+cur_round_audio_check[0]},
 			{stimulus: 'stims/'+cur_round_audio_check[1]},
-		]
+		],
+		iti: 500
 	};
 
 	trainingList.push(audio_check);
@@ -289,7 +288,6 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 	 			im2: stims[stimNames[currentStims[1]]]["image"],
 				im1_condition:stims[stimNames[currentStims[0]]]["item_condition"],
 				im2_condition:stims[stimNames[currentStims[1]]]["item_condition"],
-			 	choices: ['START'],
 	    		data: {trialNum: trainingNum, trialType: "learning-prompt",round_condition: cur_condition, round_number: round_num}
 	 		};
 		
@@ -310,9 +308,9 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 			 	audio: "true",
 	    		data: {trialNum: trainingNum, trialType: "learning", round_condition: cur_condition, round_number: round_num}
 	 		};
-			 //trainingCTBList.push(trial);
+			 trainingCTBList.push(trial);
 		};
-		//trainingList=trainingList.concat(trainingCTBList);
+		trainingList=trainingList.concat(trainingCTBList);
 	};
 
 
@@ -507,46 +505,6 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 		testNum++;
 	};
 	};
-
-	// DEFINE TEST TRIALS
-	//
-	// var prodTestList=[];
-	// var numProdLabelTestTrialsPerBlock = 8;
-	// var prodTestTrialsIndex=[0,1,2,3,4,5,6,7];
-	// var numProdTestBlocks = 1;
-	// var testProdNum = 1;
-	//
-	// // start with instructions about the label test
-	// // put in instructions about being fast here if we are interested in RTs
-	// var labelProdTestInstr = {
-	// type: 'instructions',
-	// pages: ['Next, we will test your knowledge of names of the aliens a different way. On each trial, you will see an alien. Enter the name for the alien into the test box and press enter. Make your best guess if you are unsure. Click NEXT to get started.'],
-	// show_clickable_nav: true
-	// }
-	//
-	// prodTestList.push(labelProdTestInstr);
-	//
-	//
-	// for (i =0; i < numTestBlocks; i++) {
-	//
-	// 	curProdTestOrderIndex = jsPsych.randomization.shuffle(prodTestTrialsIndex);
-	//
-	// 	for (j =0; j < curProdTestOrderIndex.length; j++) {
-	//
-	// 		var curTargetIndex=curProdTestOrderIndex[j];
-	//
-	// 		var prod_test = {
-	// 			type: 'production-test-singlepic',
-	// 			targetIm: stims[stimNames[curTargetIndex]]["image"],
-	// 	    	label: stims[stimNames[curTargetIndex]]["word"],
-	// 		choices: ['ENTER'],
-	// 	    	data: {trialNum: testProdNum, trialType: "production-test"}
-	// 	};
-	//
-	// 	prodTestList.push(prod_test);
-	// 	testProdNum++;
-	// };
-	// };
 	
 	//combine all trials into timeline
 	cur_timeline=trainingList.concat(selectList);
@@ -575,9 +533,9 @@ var survey = {
 //timeline = selectList;
 //timeline = prodTestList;
 
-overall_timeline=[fullscreen,trial_instructions_1,trial_instructions_2];
+overall_timeline=[audio_check];
 overall_timeline=overall_timeline.concat(selectList);
-overall_timeline=selectList
+overall_timeline=trainingList;
 console.log(overall_timeline)
 
 // CREATE FINAL EXPERIMENT MESSAGE/ DEBRIEF AFTER DATA SUCCESSFULLY STORED
@@ -670,7 +628,7 @@ function startExperiment(){
 		default_iti: 0,
 		on_finish: function(data) {
 			//for testing: display data and store locally
-			jsPsych.data.displayData("csv");
+			//jsPsych.data.displayData("csv");
 			//jsPsych.data.localSave("CrossPC_"+subject_id+".csv", "csv");
 			
 			//add final instructions after data has been stored

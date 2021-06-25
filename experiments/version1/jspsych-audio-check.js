@@ -14,24 +14,72 @@ jsPsych.plugins["audio-check"] = (function() {
 
   //var context = new AudioContext();
 
-  jsPsych.pluginAPI.registerPreload('single-audio', 'stimulus', 'audio');
+  jsPsych.pluginAPI.registerPreload('audio-check', 'stimulus', 'audio');
+  
+  plugin.info = {
+    name: 'audio-check',
+    description: '',
+    parameters: {
+        stimulus: {
+          type: jsPsych.plugins.parameterType.AUDIO,
+          pretty_name: 'Stimulus',
+          default: undefined,
+          description: 'The audio to be played.'
+        },
+ 	  prompt: {
+          type: jsPsych.plugins.parameterType.STRING,
+          pretty_name: 'prompt',
+          default: "Click on the Play button to hear an audio recording. Then enter the word you heard. Click the button to hear the sound again. Click on the Submit Answers button when you are finished.<br>",
+          description: 'prompt text'
+        },
+        columns: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'columns',
+          default: 40,
+          description: 'Column width of text box.'
+        },
+        rows: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'rows',
+          default: 1,
+          description: 'Row length of text box.'
+        },
+
+        play_button_html: {
+            type: jsPsych.plugins.parameterType.STRING,
+            pretty_name: 'Play Button HTML',
+            default: '<button class="jspsych-btn">Play</button>',
+            description: 'The html of the button. Can create own style.'
+        },
+
+        submit_button_html: {
+            type: jsPsych.plugins.parameterType.STRING,
+            pretty_name: 'Submit Button HTML',
+            default: '<button class="jspsych-btn">Submit Answers</button>',
+            description: 'The html of the button. Can create own style.'
+        },
+        margin_vertical: {
+          type: jsPsych.plugins.parameterType.STRING,
+          pretty_name: 'Margin vertical',
+          default: '0px',
+          description: 'Vertical margin of button.'
+        },
+        margin_horizontal: {
+          type: jsPsych.plugins.parameterType.STRING,
+          pretty_name: 'Margin horizontal',
+          default: '8px',
+          description: 'Horizontal margin of button.'
+        },
+        iti: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'ITI',
+          default: 0,
+          description: 'Pause after clearing the screen.'
+        },
+    }
+  }
 
   plugin.trial = function(display_element, trial) {
-
-    // default parameters
-    trial.choices = trial.choices || [];
-    trial.response_ends_trial = (typeof trial.response_ends_trial === 'undefined') ? true : trial.response_ends_trial;
-    // timing parameters
-    trial.timing_response = trial.timing_response || -1; // if -1, then wait for response forever
-    trial.prompt = (typeof trial.prompt === 'undefined') ? "" : trial.prompt;
-	trial.columns = trial.columns || 40;
-	trial.rows = trial.rows || 1;
-	trial.timing_post_trial = typeof trial.timing_post_trial == 'undefined' ? 500 : trial.timing_post_trial;
-
-    // if any trial variables are functions
-    // this evaluates the function and replaces
-    // it with the output of the function
-    trial = jsPsych.pluginAPI.evaluateFunctionParameters(trial);
 
 
     // play stimulus
@@ -42,45 +90,38 @@ jsPsych.plugins["audio-check"] = (function() {
     // source.start(startTime);
 
 	var audio = new Audio(trial.stimulus);
+	
+	var html = "";
 
-    // show prompt if there is one
-    if (trial.prompt !== "") {
-      display_element.append(trial.prompt);
-    }
+	    //show prompt if there is one
+	    if (trial.prompt !== null) {
+	      html += trial.prompt;
+	    }
 	
-    // add audioplay button
-    display_element.append($('<button>', {
-      'id': 'jspsych-audio-play',
-      'class': 'jspsych-btn jspsych-survey-text'
-    }));
-    $("#jspsych-audio-play").html('Play');
-    $("#jspsych-audio-play").click(function() {
-		audio.play();
-	});
 	
-    // create div
-    display_element.append($('<div>', {
-      "id": 'jspsych-survey-text',
-      "class": 'jspsych-survey-text-question'
-    }));
-	
+    //display buttons
+    html += '<div class="jspsych-play-button-response-button" style="display: inline-block; margin:' + trial.margin_vertical + ' ' + trial.margin_horizontal + '" id="jspsych-play-button-response-button-' + 0 + '" data-choice="' + 0 + '">'+ trial.play_button_html+'</div>';
+		
+	html += '<div id="jspsych-survey-text" class="jspsych-survey-text-question" style="margin: 2em 0em;">'
 	//add text box
-	$("#jspsych-survey-text").append('<textarea id="jspsych-survey-text-response" cols="' + trial.columns[i] + '" rows="' + trial.rows[i] + '" autocorrect="off" autocapitalize="off" autocomplete="off" spellcheck="false"></textarea>');
-	//$("#jspsych-survey-text").append('<textarea id="jspsych-survey-text-response" cols="' + trial.columns[i] + '" rows="' + trial.rows[i] + '"></textarea>');
+	html +='<textarea id="jspsych-survey-text-response" cols="' + trial.columns[i] + '" rows="' + trial.rows[i] + '" autocorrect="off" autocapitalize="off" autocomplete="off" spellcheck="false"></textarea>';
+	html += '</div>';
+	
+	
+	    // add submit button
+    html += '<div id="jspsych-survey-text-next"  style="display: inline-block; margin:' + trial.margin_vertical + ' ' + trial.margin_horizontal + '">'+ trial.submit_button_html+'</div>';
 
+	display_element.innerHTML = html;
+	
+    display_element.querySelector('#jspsych-play-button-response-button-0').addEventListener('click', function () {
+        audio.play();
+    });
+	
+    display_element.querySelector('#jspsych-survey-text-next').addEventListener('click', function () {
+        end_trial();
+    });
 
 	var startTime = (new Date()).getTime();
-	
-    // add submit button
-    display_element.append($('<button>', {
-      'id': 'jspsych-survey-text-next',
-      'class': 'jspsych-btn jspsych-survey-text'
-    }));
-    $("#jspsych-survey-text-next").html('Submit Answers');
-    $("#jspsych-survey-text-next").click(function() {
-		end_trial();
-	});
-	
 
     // function to end trial when it is time
     var end_trial = function() {
@@ -89,7 +130,8 @@ jsPsych.plugins["audio-check"] = (function() {
         var endTime = (new Date()).getTime();
         var response_time = endTime - startTime;
 		
-		var val = document.getElementById("jspsych-survey-text-response").value;
+		//var val = document.getElementById("jspsych-survey-text-response").value;
+		var val = display_element.querySelector("#jspsych-survey-text-response").value;
 		console.log(val);
 
       // stop the audio file if it is playing
@@ -103,10 +145,14 @@ jsPsych.plugins["audio-check"] = (function() {
       };
 
       // clear the display
-      display_element.html('');
+     display_element.innerHTML = '';
+	 
+	setTimeout(function(){
+        // move on to the next trial
+        jsPsych.finishTrial(trial_data);
+	},trial.iti);
 
-      // move on to the next trial
-      jsPsych.finishTrial(trial_data);
+      
     };
 	
   };

@@ -16,33 +16,70 @@ jsPsych.plugins['learning-prompt'] = (function() {
   jsPsych.pluginAPI.registerPreload('learning', 'im2', 'image');
   jsPsych.pluginAPI.registerPreload('learning', 'im3', 'image');
 
+  plugin.info = {
+    name: 'selection-learning',
+    description: '',
+    parameters: {
+        canvas_size: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'Canvas size',
+          array: true,
+          default: [1024,700],
+          description: 'Array specifying the width and height of the area that the animation will display in.'
+        },
+        image_size: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'Image size',
+          array: true,
+          default: [150,150],
+          description: 'Array specifying the width and height of the images to show.'
+        },
+        location1: {
+           type: jsPsych.plugins.parameterType.STRING,
+           pretty_name: 'Location 1',
+           default: "left",
+           description: 'First location'
+         },
+   	  location2: {
+            type: jsPsych.plugins.parameterType.STRING,
+            pretty_name: 'Location 2',
+            default: "right",
+            description: 'Second location'
+          },
+     prompt: {
+        type: jsPsych.plugins.parameterType.STRING,
+        pretty_name: 'prompt',
+        default: "Learn the names for the two aliens!",
+        description: 'trial instructions'
+      },
+        duration: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'Audio duration',
+          default: 1000,
+          description: 'Audio Duration'
+        },
+        timing_response: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'timing response',
+          default: -1, // if -1, then wait for response forever
+          description: 'For setting a trial duration limit'
+        },
+		response_ends_trial: {
+          type: jsPsych.plugins.parameterType.BOOL,
+          pretty_name: 'response ends trial',
+          default: true,
+          description: 'Whether or not a response ends the trial'
+        },
+    }
+  }
+
   plugin.trial = function(display_element, trial) {
 	  
-      // default values
-      trial.canvas_size = trial.canvas_size || [1024,700];
-      trial.image_size = trial.image_size || [150, 150];
-	  trial.location1 = trial.location1 || "bottom";
-	  trial.location2 = trial.location2 || "topRight";
-	  trial.prompt = trial.prompt || "Learn the names for the two aliens!";
-	  trial.button_html = trial.button_html || '<button class="jspsych-btn">%choice%</button>';
-      trial.response_ends_trial = (typeof trial.response_ends_trial === 'undefined') ? true : trial.response_ends_trial;
-      trial.timing_response = trial.timing_response || -1; // if -1, then wait for response forever
-      trial.is_html = (typeof trial.is_html === 'undefined') ? false : trial.is_html;
-      trial.prompt = (typeof trial.prompt === 'undefined') ? "" : trial.prompt;
-	  trial.timing_post_trial = typeof trial.timing_post_trial == 'undefined' ? 0 : trial.timing_post_trial;
-	  
-	  
-	  
-      // if any trial variables are functions
-      // this evaluates the function and replaces
-      // it with the output of the function
-      trial = jsPsych.pluginAPI.evaluateFunctionParameters(trial);
+      display_element.innerHTML = "<svg id='jspsych-test-canvas' width=" + trial.canvas_size[0] + " height=" + trial.canvas_size[1] + "></svg>";
 	  
       // this array holds handlers from setTimeout calls
       // that need to be cleared if the trial ends early
       var setTimeoutHandlers = [];
-	  
-	  display_element.append($("<svg id='jspsych-test-canvas' width=" + trial.canvas_size[0] + " height=" + trial.canvas_size[1] + "></svg>"));
 
       var paper = Snap("#jspsych-test-canvas");
 	  
@@ -78,29 +115,37 @@ jsPsych.plugins['learning-prompt'] = (function() {
 		  "font-weight": "bold"
 	  })
 	  
-      //display buttons
-      var buttons = [];
-      if (Array.isArray(trial.button_html)) {
-        if (trial.button_html.length == trial.choices.length) {
-          buttons = trial.button_html;
-        } else {
-          console.error('Error in learning-prompt plugin. The length of the button_html array does not equal the length of the choices array');
-        }
-      } else {
-        for (var i = 0; i < trial.choices.length; i++) {
-          buttons.push(trial.button_html);
-        }
-      }
-      display_element.append('<div id="jspsych-learning-prompt-btngroup" class="center-content block-center"></div>')
-      for (var i = 0; i < trial.choices.length; i++) {
-        var str = buttons[i].replace(/%choice%/g, trial.choices[i]);
-        $('#jspsych-learning-prompt-btngroup').append(
-          $(str).attr('id', 'jspsych-learning-prompt-button-' + i).data('choice', i).addClass('jspsych-learning-prompt-button').on('click', function(e) {
-            var choice = $('#' + this.id).data('choice');
-            after_response(choice);
-          })
-        );
-      }
+	  //display buttons
+	  var button_block= paper.rect(360, 200, 80, 40, 10, 10);
+
+	  button_block.attr({
+	      fill: "rgb(236, 240, 241)",
+	      stroke: "#1f2c39",
+	      strokeWidth: 3
+	  });
+	  var button_text = paper.text(400,225, "START");
+	  button_text.attr({
+		  "text-anchor": "middle",
+		  "font-weight": "bold"
+	  });
+	  var button_block_cover= paper.rect(360, 200, 80, 40, 10, 10);
+	  button_block_cover.attr({
+	      fill: "rgb(236, 240, 241)",
+	      stroke: "#1f2c39",
+	      strokeWidth: 3,
+		  opacity: 0
+	  });
+	  
+	  var button = paper.g(button_block,button_text,button_block_cover);
+	  
+	  button.click(function() {
+		  button.unclick();
+		  button.attr({
+			  opacity: 0,
+		  })
+		var choice = "start"
+        after_response(choice)
+	  });
 
       // store response
       var response = {
@@ -119,9 +164,6 @@ jsPsych.plugins['learning-prompt'] = (function() {
         var rt = end_time - start_time;
         response.button = choice;
         response.rt = rt;
-
-        // disable all the buttons after a response
-        $('.jspsych-learning-prompt-button').off('click').attr('disabled', 'disabled');
 
         if (trial.response_ends_trial) {
           end_trial();
@@ -150,7 +192,7 @@ jsPsych.plugins['learning-prompt'] = (function() {
         };
 
         // clear the display
-        display_element.html('');
+        display_element.innerHTML = '';
 
         // move on to the next trial
         jsPsych.finishTrial(trial_data);

@@ -31,7 +31,7 @@ jsPsych.plugins['selection-learning'] = (function() {
         },
       audio: {
         type: jsPsych.plugins.parameterType.STRING,
-        pretty_name: 'Audio?',
+        pretty_name: 'Audio',
         default: "true",
         description: 'If true, audio is played.'
       },
