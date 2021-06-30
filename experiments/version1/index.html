@@ -37,11 +37,11 @@ function getParamFromURL( name ) {
 		return results[1];
 }
 //set random seed
-var random_seed = getParamFromURL( 'seed' );
+//var random_seed = getParamFromURL( 'seed' );
 //make sure that nobody can enter anything damaging or crazy for seed
-random_seed.replace(/[^A-Za-z0-9_]/g, "");
-console.log(random_seed);
-Math.seedrandom(random_seed);
+//random_seed.replace(/[^A-Za-z0-9_]/g, "");
+//console.log(random_seed);
+//Math.seedrandom(random_seed);
 
 // ORGANIZE SUBJECT ID & GENERAL PARAMETERS
 // generate a random subject ID (just to be safe)
@@ -81,7 +81,7 @@ jsPsych.data.addProperties({
 	subject: subject_id,
 	condition: condition,
 	workerId: workerId,
-	seed: random_seed 
+	//seed: random_seed 
 });
 
 // DEFINE AND RANDOMIZE STIMULI
@@ -98,7 +98,7 @@ var wordsShuffled = jsPsych.randomization.shuffle(wordItems);
 var audio_check_shuffled = jsPsych.randomization.shuffle(audio_check);
 
 //create first passive choices
-var image_indices = [0,1,2,3,4,5,6,7];
+var image_indices = [0,1];
 var num_select_trials = 4;
 var passive_choice_index = [];
 for (p=0; p<num_select_trials; p++) {
@@ -534,10 +534,9 @@ var survey = {
 //timeline = prodTestList;
 
 // overall_timeline=[audio_check];
-// overall_timeline=overall_timeline.concat(trainingList)
-// overall_timeline=overall_timeline.concat(selectList);
-// overall_timeline=overall_timeline.concat(testList);
-console.log(overall_timeline)
+// // overall_timeline=overall_timeline.concat(trainingList)
+// // overall_timeline=overall_timeline.concat(testList);
+// console.log(overall_timeline)
 
 // CREATE FINAL EXPERIMENT MESSAGE/ DEBRIEF AFTER DATA SUCCESSFULLY STORED
 // including a random code participants can use to confirm they took the study (for payment on Amazon Mechanical Turk)

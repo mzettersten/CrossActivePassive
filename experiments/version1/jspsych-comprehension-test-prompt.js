@@ -68,56 +68,56 @@ jsPsych.plugins['comprehension-test-prompt'] = (function() {
 
       var paper = Snap("#jspsych-test-canvas");
 	  
-	  var circle1 = paper.circle(125, 325, 90);
+	  var circle1 = paper.circle(212, 325, 90);
 	  circle1.attr({
 		  fill: "#FFD3D6",
 		  stroke: "#000",
 		  strokeWidth: 5
 	  });
 	  
-	  var circle2 = paper.circle(325, 325, 90);
+	  var circle2 = paper.circle(412, 325, 90);
 	  circle2.attr({
 		  fill: "#FFD3D6",
 		  stroke: "#000",
 		  strokeWidth: 5
 	  });
 	  
-	  var circle3 = paper.circle(525, 325, 90);
+	  var circle3 = paper.circle(612, 325, 90);
 	  circle3.attr({
 		  fill: "#FFD3D6",
 		  stroke: "#000",
 		  strokeWidth: 5
 	  });
 	  
-	  var circle4 = paper.circle(725, 325, 90);
+	  var circle4 = paper.circle(812, 325, 90);
 	  circle4.attr({
 		  fill: "#FFD3D6",
 		  stroke: "#000",
 		  strokeWidth: 5
 	  });
 	  
-	  var circle5 = paper.circle(125, 525, 90);
+	  var circle5 = paper.circle(212, 525, 90);
 	  circle5.attr({
 		  fill: "#FFD3D6",
 		  stroke: "#000",
 		  strokeWidth: 5
 	  });
 	  
-	  var circle6 = paper.circle(325, 525, 90);
+	  var circle6 = paper.circle(412, 525, 90);
 	  circle6.attr({
 		  fill: "#FFD3D6",
 		  stroke: "#000",
 		  strokeWidth: 5
 	  });
 	  
-	  var circle7 = paper.circle(525, 525, 90);
+	  var circle7 = paper.circle(612, 525, 90);
 	  circle7.attr({
 		  fill: "#FFD3D6",
 		  stroke: "#000",
 		  strokeWidth: 5
 	  });
 	  
-	  var circle8 = paper.circle(725, 525, 90);
+	  var circle8 = paper.circle(812, 525, 90);
 	  circle8.attr({
 		  fill: "#FFD3D6",
 		  stroke: "#000",
@@ -126,14 +126,14 @@ jsPsych.plugins['comprehension-test-prompt'] = (function() {
 
 	  
 	  var imageLocations = {
-		  pos1: [50, 250],
-		  pos2: [250, 250],
-		  pos3: [450, 250],
-		  pos4: [650, 250],
-		  pos5: [50, 450],
-		  pos6: [250, 450],
-		  pos7: [450, 450],
-		  pos8: [650, 450],
+		  pos1: [137, 250],
+		  pos2: [337, 250],
+		  pos3: [537, 250],
+		  pos4: [737, 250],
+		  pos5: [137, 450],
+		  pos6: [337, 450],
+		  pos7: [537, 450],
+		  pos8: [737, 450],
 	  };
 	  
 	  var image1 = paper.image(trial.image1, imageLocations["pos1"][0], imageLocations["pos1"][1], trial.image_size[0],trial.image_size[1]);
@@ -147,7 +147,7 @@ jsPsych.plugins['comprehension-test-prompt'] = (function() {
 	  	  
 	  //add prompt text
 	  //display_element.append(trial.question + trial.label + "?");
-	  var text = paper.text(425, 50, trial.question);
+	  var text = paper.text(512, 50, trial.question);
 	  //var labelText = paper.text(400, 225, trial.label);
 	  text.attr({
 		  "text-anchor": "middle",
@@ -164,19 +164,19 @@ jsPsych.plugins['comprehension-test-prompt'] = (function() {
 	  //var audio = new Audio(trial.audio);
 	  
 	  //display buttons
-	  var button_block= paper.rect(360, 200, 80, 40, 10, 10);
+	  var button_block= paper.rect(472, 125, 80, 40, 10, 10);
 
 	  button_block.attr({
 	      fill: "rgb(236, 240, 241)",
 	      stroke: "#1f2c39",
 	      strokeWidth: 3
 	  });
-	  var button_text = paper.text(400,225, "START");
+	  var button_text = paper.text(512,150, "START");
 	  button_text.attr({
 		  "text-anchor": "middle",
 		  "font-weight": "bold"
 	  });
-	  var button_block_cover= paper.rect(360, 200, 80, 40, 10, 10);
+	  var button_block_cover= paper.rect(472, 125, 80, 40, 10, 10);
 	  button_block_cover.attr({
 	      fill: "rgb(236, 240, 241)",
 	      stroke: "#1f2c39",

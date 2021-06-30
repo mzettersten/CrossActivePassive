@@ -100,8 +100,10 @@ jsPsych.plugins["audio-check"] = (function() {
 	
 	
     //display buttons
+    html += '<div id="jspsych-play-button-response-group" class="jspsych-play-button-response-group">'
     html += '<div class="jspsych-play-button-response-button" style="display: inline-block; margin:' + trial.margin_vertical + ' ' + trial.margin_horizontal + '" id="jspsych-play-button-response-button-' + 0 + '" data-choice="' + 0 + '">'+ trial.play_button_html+'</div>';
-		
+		html += '</div>';
+
 	html += '<div id="jspsych-survey-text" class="jspsych-survey-text-question" style="margin: 2em 0em;">'
 	//add text box
 	html +='<textarea id="jspsych-survey-text-response" cols="' + trial.columns[i] + '" rows="' + trial.rows[i] + '" autocorrect="off" autocapitalize="off" autocomplete="off" spellcheck="false"></textarea>';
@@ -109,7 +111,9 @@ jsPsych.plugins["audio-check"] = (function() {
 	
 	
 	    // add submit button
+      html += '<div id="jspsych-survey-next" class="jspsych-survey-next">'
     html += '<div id="jspsych-survey-text-next"  style="display: inline-block; margin:' + trial.margin_vertical + ' ' + trial.margin_horizontal + '">'+ trial.submit_button_html+'</div>';
+    html += '</div>';
 
 	display_element.innerHTML = html;
 	

@@ -83,14 +83,14 @@ jsPsych.plugins['learning-prompt'] = (function() {
 
       var paper = Snap("#jspsych-test-canvas");
 	  
-	  var topLeftCircle = paper.circle(250, 225, 90);
+	  var topLeftCircle = paper.circle(362, 225, 90);
 	  topLeftCircle.attr({
 		  fill: "#FFD3D6",
 		  stroke: "#000",
 		  strokeWidth: 5
 	  });
 	  
-	  var topRightCircle = paper.circle(550, 225, 90);
+	  var topRightCircle = paper.circle(662, 225, 90);
 	  topRightCircle.attr({
 		  fill: "#FFD3D6",
 		  stroke: "#000",
@@ -99,8 +99,8 @@ jsPsych.plugins['learning-prompt'] = (function() {
 
 	  
 	  var imageLocations = {
-		  left: [175, 150],
-		  right: [475, 150]
+		  left: [287, 150],
+		  right: [587, 150]
 	  };
 	  
 	  var image1 = paper.image(trial.im1, imageLocations[trial.location1][0], imageLocations[trial.location1][1], trial.image_size[0],trial.image_size[1]);
@@ -108,27 +108,34 @@ jsPsych.plugins['learning-prompt'] = (function() {
 
 	  //add prompt text
 	  //display_element.append(trial.question + trial.label + "?");
-	  var text = paper.text(400, 50, trial.prompt);
+	  var text = paper.text(512, 50, trial.prompt);
 	  text.attr({
 		  "text-anchor": "middle",
 		  editable: true,
 		  "font-weight": "bold"
 	  })
 	  
+	  var text_start = paper.text(512, 75, "Click START to hear the names.");
+	  text_start.attr({
+		  "text-anchor": "middle",
+		  editable: true,
+		  "font-weight": "bold"
+	  })
+	  
 	  //display buttons
-	  var button_block= paper.rect(360, 200, 80, 40, 10, 10);
+	  var button_block= paper.rect(472, 200, 80, 40, 10, 10);
 
 	  button_block.attr({
 	      fill: "rgb(236, 240, 241)",
 	      stroke: "#1f2c39",
 	      strokeWidth: 3
 	  });
-	  var button_text = paper.text(400,225, "START");
+	  var button_text = paper.text(512,225, "START");
 	  button_text.attr({
 		  "text-anchor": "middle",
 		  "font-weight": "bold"
 	  });
-	  var button_block_cover= paper.rect(360, 200, 80, 40, 10, 10);
+	  var button_block_cover= paper.rect(472, 200, 80, 40, 10, 10);
 	  button_block_cover.attr({
 	      fill: "rgb(236, 240, 241)",
 	      stroke: "#1f2c39",

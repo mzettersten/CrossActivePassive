@@ -27,6 +27,35 @@ html {
 }
 */
 
+.jspsych-content-wrapper {
+	display: flex;
+   margin: auto;
+   flex: 1 1 100%;
+   width: 75%;
+ }
+
+ .jspsych-content {
+   max-width: 95%; /* this is mainly an IE 10-11 fix */
+   text-align: left;
+   margin: auto; /* this is for overflowing content */
+ }
+
+ .jspsych-instructions-nav {
+ 	text-align: center;
+ }
+
+ .jspsych-play-button-response-group {
+ 	text-align: center;
+ }
+
+ .jspsych-survey-text-question {
+ 	text-align: center;
+ }
+
+ .jspsych-survey-next {
+ 	text-align: center;
+ }
+
 #jspsych-target {
   position: relative;
 }

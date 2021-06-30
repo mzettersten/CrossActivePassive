@@ -130,19 +130,19 @@ jsPsych.plugins['selection-learning'] = (function() {
 	  var trialDuration = "NA";
 	  var word1 = "NA";
 	  var word2 = "NA";
-	  var curImageArrayIndex = trial.imageArrayIndex;
+	  var curImageArrayIndex = [0,1,2,3,4,5,6,7]; // should match image array index; defined here to avoid leakage across trials
 	  var item_conditions = [trial.item_condition1,trial.item_condition2,trial.item_condition3,trial.item_condition4,trial.item_condition5,trial.item_condition6,trial.item_condition7,trial.item_condition8]
 	  
 	  
 	  
-	  var circle1 = paper.circle(125, 350, 90);
-	  var circle2 = paper.circle(325, 350, 90);
-	  var circle3 = paper.circle(525, 350, 90);
-	  var circle4 = paper.circle(725, 350, 90);
-	  var circle5 = paper.circle(125, 550, 90);
-	  var circle6 = paper.circle(325, 550, 90);
-	  var circle7 = paper.circle(525, 550, 90);
-	  var circle8 = paper.circle(725, 550, 90);
+	  var circle1 = paper.circle(212, 350, 90);
+	  var circle2 = paper.circle(412, 350, 90);
+	  var circle3 = paper.circle(612, 350, 90);
+	  var circle4 = paper.circle(812, 350, 90);
+	  var circle5 = paper.circle(212, 550, 90);
+	  var circle6 = paper.circle(412, 550, 90);
+	  var circle7 = paper.circle(612, 550, 90);
+	  var circle8 = paper.circle(812, 550, 90);
 	  
 	  //create circle set and dict
 	  var circleSet= Snap.set(circle1,circle2,circle3,circle4,circle5,circle6,circle7,circle8);
@@ -155,17 +155,17 @@ jsPsych.plugins['selection-learning'] = (function() {
 
 	  
 	  var imageLocations = {
-		  pos1: [50, 275],
-		  pos2: [250, 275],
-		  pos3: [450, 275],
-		  pos4: [650, 275],
-		  pos5: [50, 475],
-		  pos6: [250, 475],
-		  pos7: [450, 475],
-		  pos8: [650, 475],
+		  pos1: [137, 275],
+		  pos2: [337, 275],
+		  pos3: [537, 275],
+		  pos4: [737, 275],
+		  pos5: [137, 475],
+		  pos6: [337, 475],
+		  pos7: [537, 475],
+		  pos8: [737, 475],
 	  };
 	  
-	  var topLeftCircle = paper.circle(275, 125, 90);
+	  var topLeftCircle = paper.circle(362, 125, 90);
 	  topLeftCircle.attr({
 		  fill: "#FFD3D6",
 		  stroke: "#000",
@@ -173,7 +173,7 @@ jsPsych.plugins['selection-learning'] = (function() {
 		  opacity: 0
 	  });
 	  
-	  var topRightCircle = paper.circle(575, 125, 90);
+	  var topRightCircle = paper.circle(662, 125, 90);
 	  topRightCircle.attr({
 		  fill: "#FFD3D6",
 		  stroke: "#000",
@@ -181,13 +181,13 @@ jsPsych.plugins['selection-learning'] = (function() {
 		  opacity: 0
 	  });
 	  
-	  var label1 = paper.text(425, 125, "");
+	  var label1 = paper.text(512, 125, "");
 	  label1.attr({
 		  opacity: 0,
 		  "text-anchor": "middle",
 		  "font-weight": "bold"
 	  });
-	  var label2 = paper.text(425, 125, "");
+	  var label2 = paper.text(512, 125, "");
 	  label2.attr({
 		  opacity: 0,
 		  "text-anchor": "middle",
@@ -196,8 +196,8 @@ jsPsych.plugins['selection-learning'] = (function() {
 
 	  
 	  var imageLocationsLearning = {
-		  left: [200, 50],
-		  right: [500, 50]
+		  left: [287, 50],
+		  right: [587, 50]
 	  };
 	  
 	  var image1 = paper.image(trial.image1, imageLocations["pos1"][0], imageLocations["pos1"][1], trial.image_size[0],trial.image_size[1]);
@@ -217,18 +217,18 @@ jsPsych.plugins['selection-learning'] = (function() {
 	  if (trial.condition=="active") {
 	  //add prompt text
 	  //display_element.append(trial.question + trial.label + "?");
-	  var text = paper.text(425, 235, trial.question1 );
+	  var text = paper.text(512, 235, trial.question1 );
 	  text.attr({
 		  "text-anchor": "middle",
 		  "font-weight": "bold"
 	  });
   } else if (trial.condition=="passive") {
-	  var text = paper.text(425, 210, trial.question1 );
+	  var text = paper.text(512, 210, trial.question1 );
 	  text.attr({
 		  "text-anchor": "middle",
 		  "font-weight": "bold"
 	  });
-	  var text2 = paper.text(425, 235, trial.question2 );
+	  var text2 = paper.text(512, 235, trial.question2 );
 	  text2.attr({
 		  "text-anchor": "middle",
 		  "font-weight": "bold"
@@ -327,19 +327,19 @@ jsPsych.plugins['selection-learning'] = (function() {
 	  });
   } else if (trial.condition=="passive") {
 	  // add button to initiate first random selection
-	  var passive_button_block= paper.rect(310, 140, 230, 40, 10, 10);
+	  var passive_button_block= paper.rect(397, 140, 230, 40, 10, 10);
 
 	  passive_button_block.attr({
 	      fill: "rgb(236, 240, 241)",
 	      stroke: "#1f2c39",
 	      strokeWidth: 3
 	  });
-	  var passive_button_text = paper.text(425,165, "SELECT RANDOM ALIENS");
+	  var passive_button_text = paper.text(512,165, "SELECT RANDOM ALIENS");
 	  passive_button_text.attr({
 		  "text-anchor": "middle",
 		  "font-weight": "bold"
 	  });
-	  var passive_button_block_cover= paper.rect(310, 140, 230, 40, 10, 10);
+	  var passive_button_block_cover= paper.rect(397, 140, 230, 40, 10, 10);
 	  passive_button_block_cover.attr({
 	      fill: "rgb(236, 240, 241)",
 	      stroke: "#1f2c39",
@@ -385,9 +385,6 @@ jsPsych.plugins['selection-learning'] = (function() {
 		  image7.unclick();
 		  image8.unclick();
 	  };
-
-	  console.log(choiceIndex);
-	  console.log(rt);
 		  //choice info
 		  choiceLabel=trial.stims[trial.stimNames[trial.curLocationList[choiceIndex]]]["word"];
 		  choice=trial.stims[trial.stimNames[trial.curLocationList[choiceIndex]]]["image"];
@@ -399,7 +396,7 @@ jsPsych.plugins['selection-learning'] = (function() {
 		  
 		  //make random choice
 		  randomIndex=jsPsych.randomization.sampleWithReplacement(curImageArrayIndex,1)[0];
-		  randomKey = trial.imageArrayKey[randomIndex]
+		  randomKey = trial.imageArrayKey[randomIndex];
 	  
 		  //random choice info
 		  randomLabel=trial.stims[trial.stimNames[trial.curLocationList[randomIndex]]]["word"];
@@ -446,7 +443,7 @@ jsPsych.plugins['selection-learning'] = (function() {
 		  
 		  
 		  //introduce learning instruction
-		  var learningInstr = paper.text(425, 20, trial.learningText);
+		  var learningInstr = paper.text(512, 20, trial.learningText);
 		  learningInstr.attr({
 			  opacity: 1,
 			  "text-anchor": "middle",
@@ -469,19 +466,19 @@ jsPsych.plugins['selection-learning'] = (function() {
 		  });
 		  
 		  //display buttons
-		  var button_block= paper.rect(385, 100, 80, 40, 10, 10);
+		  var button_block= paper.rect(472, 100, 80, 40, 10, 10);
 
 		  button_block.attr({
 		      fill: "rgb(236, 240, 241)",
 		      stroke: "#1f2c39",
 		      strokeWidth: 3
 		  });
-		  var button_text = paper.text(425,125, "START");
+		  var button_text = paper.text(512,125, "START");
 		  button_text.attr({
 			  "text-anchor": "middle",
 			  "font-weight": "bold"
 		  });
-		  var button_block_cover= paper.rect(385, 100, 80, 40, 10, 10);
+		  var button_block_cover= paper.rect(472, 100, 80, 40, 10, 10);
 		  button_block_cover.attr({
 		      fill: "rgb(236, 240, 241)",
 		      stroke: "#1f2c39",
