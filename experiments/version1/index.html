@@ -10,6 +10,7 @@
   	<script src="js/jspsych.js"></script>
 	<script src="plugins/jspsych-instructions.js"></script>
 	<script src="plugins/jspsych-fullscreen.js"></script>
+	<script src="plugins/jspsych-preload.js"></script>
   	<script src="jspsych-learning.js"></script>
 	<script src="jspsych-learning-prompt.js"></script>
 	<script src="jspsych-comprehension-test-prompt.js"></script>
@@ -128,8 +129,46 @@ for (cur_round=0; cur_round<total_rounds; cur_round++) {
 //console.log(round_words);
 //console.log(round_audio_check);
 
+
+
 // TWO EXPERIMENTAL ROUNDS
 var overall_timeline = []
+
+//preload all images
+var imageSet = items;
+console.log(imageSet)
+
+//preload audio (if audio gets added at some later point)  
+var allAudio = [];
+for (var i = 0; i < audio_check.length; i++) {
+	allAudio.push("stims/"+audio_check[i])
+};
+for (var i = 0; i < wordItems.length; i++) {
+	allAudio.push("stims/"+wordItems[i]+".m4a")
+};
+console.log(allAudio)
+ 
+//function for tracking loading of audio files
+//useful if there are a lot of audio files 
+// function updateLoadedCount(nLoaded){
+//      var percentcomplete = nLoaded / allAudio.length * 100;
+
+//      // could put something fancier here, like a progress bar
+//      // or updating text in the DOM.
+//      console.log('Loaded '+percentcomplete+'% of audio files');
+//  }
+
+//run this line instead if we add audio
+// jsPsych.pluginAPI.preloadImages(imageSet, function(){ jsPsych.pluginAPI.preloadAudio(allAudio, function() {startExperiment(); },function(nLoaded) { updateLoadedCount(nLoaded); });});
+
+  var preload = {
+    type: 'preload',
+    images: imageSet,
+    audio: allAudio
+}
+
+
+overall_timeline.push(preload);
   
 //make experiment full screen
 var fullscreen = {
@@ -586,43 +625,9 @@ var final_instructions = {
 
 //add instructions trial to experiment
 experimentFinal.push(final_instructions);
-
-
-
-// PRELOADING
-// this should be handled within the plugins, but I've gotten mixed results relying on this,
-// so to be extra sure, preload all relevant files prior to starting the experiment
-
  
-//preload all images
-var imageSet = items;
-
-//preload audio (if audio gets added at some later point)  
-var allAudio = [];
-for (var i = 0; i < wordItems.length; i++) {
-	allAudio.push("stims/"+wordItems[i]+".m4a")
-};
-console.log(allAudio)
- 
-//function for tracking loading of audio files
-//useful if there are a lot of audio files 
-function updateLoadedCount(nLoaded){
-     var percentcomplete = nLoaded / allAudio.length * 100;
-
-     // could put something fancier here, like a progress bar
-     // or updating text in the DOM.
-     console.log('Loaded '+percentcomplete+'% of audio files');
- }
-
-//run this line instead if we add audio
-jsPsych.pluginAPI.preloadImages(imageSet, function(){ jsPsych.pluginAPI.preloadAudio(allAudio, function() {startExperiment(); },function(nLoaded) { updateLoadedCount(nLoaded); });});
-
-//jsPsych.pluginAPI.preloadImages(imageSet, function() {startExperiment();});
-  
 
 
-//function to initialize the experiment; will be called once all images are preloaded
-function startExperiment(){
 	jsPsych.init({
 		timeline: overall_timeline,
 		show_progress_bar: true,
@@ -638,7 +643,6 @@ function startExperiment(){
 			});
 		}
 	});
-};
   
   
 </script>
