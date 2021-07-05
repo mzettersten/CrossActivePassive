@@ -43,6 +43,12 @@ jsPsych.plugins['learning'] = (function() {
             default: "right",
             description: 'Second location'
           },
+          cur_label: {
+             type: jsPsych.plugins.parameterType.STRING,
+             pretty_name: 'Current Label',
+             default: null,
+             description: 'Currently played label'
+           },
           label1: {
              type: jsPsych.plugins.parameterType.STRING,
              pretty_name: 'Label 1',
@@ -61,6 +67,12 @@ jsPsych.plugins['learning'] = (function() {
         default: "true",
         description: 'If true, audio is played.'
       },
+      stimulus: {
+        type: jsPsych.plugins.parameterType.AUDIO,
+        pretty_name: 'Stimulus',
+        default: undefined,
+        description: 'The current audio to be played.'
+      },
       audio1: {
         type: jsPsych.plugins.parameterType.AUDIO,
         pretty_name: 'Audio 1',
@@ -73,6 +85,7 @@ jsPsych.plugins['learning'] = (function() {
         default: undefined,
         description: 'The second audio to be played.'
       },
+	  
      prompt: {
         type: jsPsych.plugins.parameterType.STRING,
         pretty_name: 'prompt',
@@ -135,14 +148,21 @@ jsPsych.plugins['learning'] = (function() {
 		  "font-weight": "bold"
 	  });
 	  
-	  var label1 = paper.text(512, 225, trial.label1);
-	  label1.attr({
-		  opacity: 0,
-		  "text-anchor": "middle",
-		  "font-weight": "bold"
-	  });
-	  var label2 = paper.text(512, 225, trial.label2);
-	  label2.attr({
+	  // var label1 = paper.text(512, 225, trial.label1);
+	  // label1.attr({
+	  // 		  opacity: 0,
+	  // 		  "text-anchor": "middle",
+	  // 		  "font-weight": "bold"
+	  // });
+	  // var label2 = paper.text(512, 225, trial.label2);
+	  // label2.attr({
+	  // 		  opacity: 0,
+	  // 		  "text-anchor": "middle",
+	  // 		  "font-weight": "bold"
+	  // });
+	  
+	  var cur_label = paper.text(512, 225, trial.cur_label);
+	  cur_label.attr({
 		  opacity: 0,
 		  "text-anchor": "middle",
 		  "font-weight": "bold"
@@ -151,8 +171,7 @@ jsPsych.plugins['learning'] = (function() {
 	  
 	  if (trial.audio == "true") {
 		  //create audio
-		  var audio1 = new Audio(trial.audio1);
-		  var audio2 = new Audio(trial.audio2);
+		  var stimulus = new Audio(trial.stimulus);
 	  };
 
 	  var start_time = (new Date()).getTime();
@@ -161,29 +180,20 @@ jsPsych.plugins['learning'] = (function() {
 	  
 	  //animate word presentation
 	  
-	  label1.animate({opacity: "1"}, 150,mina.linear, function() {
+	  cur_label.animate({opacity: "1"}, 250,mina.linear, function() {
 		  if (trial.audio == "true") {
-			  audio1.play();
+			  stimulus.play();
 		  };
-		  label1.animate({opacity: "1"}, trial.duration,mina.linear, function() {
-			  label1.animate({opacity: 0}, 150,mina.linear, function() {
-			  	label2.animate({opacity: 1}, 150,mina.linear, function() {
-					if (trial.audio == "true") {
-						audio2.play();
-					};
-					label2.animate({opacity: "1"}, trial.duration,mina.linear, function() {
-						label2.animate({opacity: 0}, 150,mina.linear, endTrial());
-					});
-				});
-			});
-		});
-	});
+		  cur_label.animate({opacity: "1"}, trial.duration,mina.linear, function() {
+			  cur_label.animate({opacity: 0}, 250,mina.linear, endTrial());
+		  });
+	  });
 	  
 	  
       function endTrial() {
-		//var audioFeedback = new Audio(trial.audioFeedback);
-		//audioFeedback.play();
         var trial_data = {
+			"stimulus": trial.stimulus,
+			"cur_label": trial.cur_label,
 			"label1": trial.label1,
 			"label2": trial.label2,
 			"location1": trial.location1,
