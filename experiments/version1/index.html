@@ -332,7 +332,7 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 		
 			trainingCTBList.push(prompt);
 
-		 	var trial = {
+		 	var trial1 = {
 	 			type: 'learning',
 	 			location1: locationShuffled[0],
 	 			location2: locationShuffled[1],
@@ -340,14 +340,35 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 	 			im2: stims[stimNames[currentStims[1]]]["image"],
 	    		label1: stims[stimNames[currentStims[wordOrderShuffled[0]]]]["word"],
 			 	label2: stims[stimNames[currentStims[wordOrderShuffled[1]]]]["word"],
+				stimulus: "stims/"+stims[stimNames[currentStims[wordOrderShuffled[0]]]]["word"]+".m4a",
+				cur_label: stims[stimNames[currentStims[wordOrderShuffled[0]]]]["word"],
 			 	audio1: "stims/"+stims[stimNames[currentStims[wordOrderShuffled[0]]]]["word"]+".m4a",
 			 	audio2: "stims/"+stims[stimNames[currentStims[wordOrderShuffled[1]]]]["word"]+".m4a",
 				im1_condition:stims[stimNames[currentStims[0]]]["item_condition"],
 				im2_condition:stims[stimNames[currentStims[1]]]["item_condition"],
 			 	audio: "true",
+				iti: 200,
 	    		data: {trialNum: trainingNum, trialType: "learning", round_condition: cur_condition, round_number: round_num}
 	 		};
-			 trainingCTBList.push(trial);
+			 trainingCTBList.push(trial1);
+ 		 	var trial2 = {
+ 	 			type: 'learning',
+ 	 			location1: locationShuffled[0],
+ 	 			location2: locationShuffled[1],
+ 	 			im1: stims[stimNames[currentStims[0]]]["image"],
+ 	 			im2: stims[stimNames[currentStims[1]]]["image"],
+ 	    		label1: stims[stimNames[currentStims[wordOrderShuffled[0]]]]["word"],
+ 			 	label2: stims[stimNames[currentStims[wordOrderShuffled[1]]]]["word"],
+				stimulus: "stims/"+stims[stimNames[currentStims[wordOrderShuffled[1]]]]["word"]+".m4a",
+				cur_label: stims[stimNames[currentStims[wordOrderShuffled[1]]]]["word"],
+ 			 	audio1: "stims/"+stims[stimNames[currentStims[wordOrderShuffled[0]]]]["word"]+".m4a",
+ 			 	audio2: "stims/"+stims[stimNames[currentStims[wordOrderShuffled[1]]]]["word"]+".m4a",
+ 				im1_condition:stims[stimNames[currentStims[0]]]["item_condition"],
+ 				im2_condition:stims[stimNames[currentStims[1]]]["item_condition"],
+ 			 	audio: "true",
+ 	    		data: {trialNum: trainingNum, trialType: "learning", round_condition: cur_condition, round_number: round_num}
+ 	 		};
+ 			 trainingCTBList.push(trial2);
 		};
 		trainingList=trainingList.concat(trainingCTBList);
 	};
