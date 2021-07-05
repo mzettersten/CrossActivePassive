@@ -10,8 +10,7 @@ jsPsych.plugins['learning'] = (function() {
   
   jsPsych.pluginAPI.registerPreload('learning', 'im1', 'image');
   jsPsych.pluginAPI.registerPreload('learning', 'im2', 'image');
-  jsPsych.pluginAPI.registerPreload('learning', 'audio1', 'audio');
-  jsPsych.pluginAPI.registerPreload('learning', 'audio2', 'audio');
+  jsPsych.pluginAPI.registerPreload('learning', 'stimulus', 'audio');
 
   plugin.info = {
     name: 'learning',
