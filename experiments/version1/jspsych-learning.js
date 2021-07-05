@@ -97,6 +97,12 @@ jsPsych.plugins['learning'] = (function() {
           pretty_name: 'Audio duration',
           default: 1000,
           description: 'Audio Duration'
+        },
+        iti: {
+          type: jsPsych.plugins.parameterType.INT,
+          pretty_name: 'Inter Trial Interval',
+          default: 0,
+          description: 'Inter trial interval.'
         }
     }
   }
@@ -180,12 +186,12 @@ jsPsych.plugins['learning'] = (function() {
 	  
 	  //animate word presentation
 	  
-	  cur_label.animate({opacity: "1"}, 250,mina.linear, function() {
+	  cur_label.animate({opacity: "1"}, 150,mina.linear, function() {
 		  if (trial.audio == "true") {
 			  stimulus.play();
 		  };
 		  cur_label.animate({opacity: "1"}, trial.duration,mina.linear, function() {
-			  cur_label.animate({opacity: 0}, 250,mina.linear, endTrial());
+			  cur_label.animate({opacity: 0}, 150,mina.linear, endTrial());
 		  });
 	  });
 	  
@@ -205,8 +211,10 @@ jsPsych.plugins['learning'] = (function() {
 			"audio": trial.audio	
 		};
 		
+		setTimeout(function(){
 		display_element.innerHTML = '';
 		jsPsych.finishTrial(trial_data);
+	}, trial.iti);
 		
       };
   };	  

@@ -347,6 +347,7 @@ for (round_num=0; round_num<total_rounds;round_num++) {
 				im1_condition:stims[stimNames[currentStims[0]]]["item_condition"],
 				im2_condition:stims[stimNames[currentStims[1]]]["item_condition"],
 			 	audio: "true",
+				iti: 200,
 	    		data: {trialNum: trainingNum, trialType: "learning", round_condition: cur_condition, round_number: round_num}
 	 		};
 			 trainingCTBList.push(trial1);
