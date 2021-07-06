@@ -309,8 +309,8 @@ jsPsych.plugins['comprehension-test'] = (function() {
 		};
 		
 
+		display_element.innerHTML = '';
 		setTimeout(function(){
-			display_element.innerHTML = '';
 			jsPsych.finishTrial(trial_data);
 		},500);
 		
