@@ -1,0 +1,282 @@
+---
+title: "CrossActivePassive V1 Analysis"
+author: "Martin Zettersten"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    toc: true
+    toc_depth: 3
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(
+                prompt  = FALSE,
+                cache   = FALSE,
+                echo = TRUE,
+                warning=F,
+                message=F)
+```
+
+```{r load packages and data, include=FALSE}
+library(tidyverse)
+library(here)
+library(cowplot)
+library(lme4)
+theme_set(theme_cowplot())
+```
+
+## Read in data
+
+```{r}
+## read in data
+d <- read_csv(here("data","version1","processed_data","crossActivePassive_v1_processed_data.csv"))
+```
+
+## Sampling {.tabset}
+
+Summarize subject-level data.
+
+```{r}
+## Active selections
+subj_sample_active <- d %>%
+  filter(trialType=="selection"&round_condition=="active") %>%
+  group_by(subject,round_condition) %>%
+  summarize(
+    prop_ambiguous=mean(choiceItemCondition=="ambiguous")
+  )
+
+sample_active_overall <- subj_sample_active %>%
+  group_by(round_condition) %>%
+  summarize(
+    N=n(),
+    mean_ambiguous=mean(prop_ambiguous),
+    sd_ambiguous=sd(prop_ambiguous),
+    ci_ambiguous=qt(0.975, N-1)*sd_ambiguous/sqrt(N),
+    mean_ambiguous_lower_ci=mean_ambiguous-ci_ambiguous,
+    mean_ambiguous_upper_ci=mean_ambiguous+ci_ambiguous
+  )
+
+##Passive selections
+subj_sample_passive <- d %>%
+  filter(trialType=="selection"&round_condition=="passive") %>%
+  group_by(subject,round_condition) %>%
+  summarize(
+    prop_ambiguous_1=mean(randomItemCondition1=="ambiguous"),
+    prop_ambiguous_2=mean(randomItemCondition2=="ambiguous"),
+  ) %>%
+  mutate(
+    prop_ambiguous=(prop_ambiguous_1+prop_ambiguous_2)/2
+  )
+
+sample_passive_overall <- subj_sample_passive %>%
+  group_by(round_condition) %>%
+  summarize(
+    N=n(),
+    mean_ambiguous=mean(prop_ambiguous),
+    sd_ambiguous=sd(prop_ambiguous),
+    ci_ambiguous=qt(0.975, N-1)*sd_ambiguous/sqrt(N),
+    mean_ambiguous_lower_ci=mean_ambiguous-ci_ambiguous,
+    mean_ambiguous_upper_ci=mean_ambiguous+ci_ambiguous
+  )
+```
+
+### Active Condition Plot
+
+```{r}
+ggplot(subj_sample_active,aes(round_condition,prop_ambiguous))+
+  geom_bar(data=sample_active_overall,aes(y=mean_ambiguous),stat="identity",width=0.3,fill="red",alpha=0.5,color="black")+
+  geom_errorbar(data=sample_active_overall,aes(y=mean_ambiguous,ymin=mean_ambiguous_lower_ci,ymax=mean_ambiguous_upper_ci),width=0)+
+  geom_dotplot(stackdir="center",binaxis="y",alpha=0.6,dotsize=0.5)+
+  geom_hline(yintercept=0.5, linetype="dashed")+
+  ylab("Proportion of Ambiguous Selections")+
+  xlab("Condition")
+```
+
+### Passive Condition Plot
+
+```{r}
+ggplot(subj_sample_passive,aes(round_condition,prop_ambiguous))+
+  geom_bar(data=sample_passive_overall,aes(y=mean_ambiguous),stat="identity",width=0.3,fill="red",alpha=0.5,color="black")+
+  geom_errorbar(data=sample_passive_overall,aes(y=mean_ambiguous,ymin=mean_ambiguous_lower_ci,ymax=mean_ambiguous_upper_ci),width=0)+
+  geom_dotplot(stackdir="center",binaxis="y",alpha=0.6,dotsize=0.5)+
+  geom_hline(yintercept=0.5, linetype="dashed")+
+  ylab("Proportion of (Random) Ambiguous Selections")+
+  xlab("Condition")
+```
+
+### Model (Active condition)
+
+```{r}
+d$ambiguous_selection <- ifelse(d$choiceItemCondition=="ambiguous",1,0)
+m <- glmer(ambiguous_selection ~ 1  + (1|subject)+ (1|choiceImage), data=filter(d,trialType=="selection"&round_condition=="active"), family=binomial)
+summary(m)
+```
+
+Robustness checks:
+
+```{r}
+t.test(subj_sample_active$prop_ambiguous,mu=0.5)
+wilcox.test(subj_sample_active$prop_ambiguous,mu=0.5)
+```
+
+## Test Performance {.tabset}
+
+Summarize subject-level performance
+
+```{r}
+subj_test_by_condition <- d %>%
+  filter(trialType=="test") %>%
+  group_by(subject,condition,round_condition) %>%
+  summarize(
+    round_n=n(),
+    accuracy=mean(isRight, na.rm=TRUE)
+  )
+
+test_by_condition <- subj_test_by_condition %>%
+  group_by(round_condition) %>%
+  summarize(
+    N=n(),
+    mean_accuracy=mean(accuracy),
+    sd_accuracy=sd(accuracy),
+    ci_accuracy=qt(0.975, N-1)*sd_accuracy/sqrt(N),
+    lower_ci=mean_accuracy-ci_accuracy,
+    upper_ci=mean_accuracy+ci_accuracy
+  )
+
+test_by_condition_by_order <- subj_test_by_condition %>%
+  group_by(condition,round_condition) %>%
+  summarize(
+    N=n(),
+    mean_accuracy=mean(accuracy),
+    sd_accuracy=sd(accuracy),
+    ci_accuracy=qt(0.975, N-1)*sd_accuracy/sqrt(N),
+    lower_ci=mean_accuracy-ci_accuracy,
+    upper_ci=mean_accuracy+ci_accuracy
+  )
+```
+
+### Plot test performance
+
+```{r}
+ggplot(subj_test_by_condition,aes(round_condition,accuracy, color=round_condition,fill=round_condition))+
+  geom_bar(data=test_by_condition,aes(y=mean_accuracy),stat="identity",width=0.3,alpha=0.5,color="black")+
+  geom_errorbar(data=test_by_condition,aes(y=mean_accuracy,ymin=lower_ci,ymax=upper_ci),width=0,color="black")+
+  geom_dotplot(stackdir="center",binaxis="y",alpha=0.6,dotsize=0.5,color="black",fill="black")+
+  geom_hline(yintercept=1/8, linetype="dashed")+
+  ylab("Test Accuracy")+
+  xlab("Condition")+
+  theme(legend.position="none")
+```
+
+### Model
+
+```{r}
+d <- d %>%
+  mutate(
+    condition_centered = case_when(
+      round_condition=="active" ~ 0.5,
+      round_condition=="passive" ~ -0.5,
+      TRUE ~ NA_real_))
+m <- glmer(isRight ~ 1 + condition_centered + (1+condition_centered|subject)+ (1|choiceImage), data=filter(d,trialType=="test"), family=binomial)
+summary(m)
+```
+
+## Sampling-Test correlations {.tabset}
+
+```{r}
+subj_sampling_test <- subj_sample_active %>%
+  bind_rows(subj_sample_passive) %>%
+  left_join(subj_test_by_condition)
+```
+
+### Plot Correlations
+
+```{r}
+ggplot(subj_sampling_test,aes(prop_ambiguous,accuracy,color=round_condition))+
+  geom_violin(aes(group=prop_ambiguous),draw_quantiles=c(0.5),trim=T)+
+  geom_jitter(width=0.02)+
+  theme(legend.position="none")+
+  geom_smooth(method="lm")+
+  facet_wrap(~round_condition)
+```
+
+### Test Correlations
+
+Active condition
+
+```{r}
+cor.test(filter(subj_sampling_test,round_condition=="active")$prop_ambiguous,filter(subj_sampling_test,round_condition=="active")$accuracy)
+```
+Passive condition
+
+```{r}
+cor.test(filter(subj_sampling_test,round_condition=="passive")$prop_ambiguous,filter(subj_sampling_test,round_condition=="passive")$accuracy)
+```
+
+### Exploratory: Test Interaction
+
+```{r}
+d <- d %>%
+  left_join(subj_sampling_test)
+m <- glmer(isRight ~ prop_ambiguous * condition_centered+(1+condition_centered|subject)+(1|choiceImage), data=filter(d,trialType=="test"), family=binomial)
+summary(m)
+```
+
+Test Active condition by centering model on active condition
+
+```{r}
+#shift condition coding (centered on active condition)
+d <- d %>%
+  mutate(
+    condition_active = case_when(
+      round_condition=="active" ~ 0,
+      round_condition=="passive" ~ -1,
+      TRUE ~ NA_real_))
+m_active <- glmer(isRight ~ prop_ambiguous * condition_active+(1+condition_active|subject)+(1|choiceImage), data=filter(d,trialType=="test"), family=binomial)
+summary(m_active)
+```
+
+Test Passive condition by centering model on passive condition
+
+```{r}
+#shift condition coding (centered on passive condition)
+d <- d %>%
+  mutate(
+    condition_passive = case_when(
+      round_condition=="active" ~ 1,
+      round_condition=="passive" ~ 0,
+      TRUE ~ NA_real_))
+m_passive <- glmer(isRight ~ prop_ambiguous * condition_passive+(1+condition_passive|subject)+(1|choiceImage), data=filter(d,trialType=="test"), family=binomial)
+summary(m_passive)
+```
+
+## Does Sampling Preference predict subject-level accuracy differences?
+
+```{r}
+subj_sampling_test_diff <- subj_sampling_test %>%
+  ungroup() %>%
+  group_by(subject, condition) %>%
+  summarize(
+    accuracy_diff=accuracy[round_condition=="active"]-accuracy[round_condition=="passive"],
+    prop_ambiguous_active=prop_ambiguous[round_condition=="active"],
+    prop_ambiguous_passive=prop_ambiguous[round_condition=="passive"],
+    prop_ambiguous_diff=prop_ambiguous_active-prop_ambiguous_passive
+  )
+
+## plot relationships
+pA <- ggplot(subj_sampling_test_diff,aes(prop_ambiguous_active,accuracy_diff))+
+  geom_jitter()+
+  geom_smooth(method="lm")+
+  xlab("Proportion Ambiguous Selections\nin Active Condition")+
+  ylab("Accuracy Difference Active - Passive")
+pB <- ggplot(subj_sampling_test_diff,aes(prop_ambiguous_diff,accuracy_diff))+
+  geom_jitter()+
+  geom_smooth(method="lm")+
+  xlab("Difference in Ambiguous Selections\nActive-Passive")+
+  ylab("Accuracy Difference Active - Passive")
+plot_grid(pA,pB)
+```
+
